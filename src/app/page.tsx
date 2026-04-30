@@ -1,57 +1,43 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { signOut } from "next-auth/react";
+import { useContacts } from "@/hooks/contact.hook";
+import type { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
-import { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
 
 export default function Home() {
-  const [contacts, setContacts] = useState<ContactDTO[]>([]);
+  const { contacts, loading, refresh, create, update, remove } = useContacts();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
-  const [loading, setLoading] = useState(true);
 
-  async function fetchContacts() {
-    const res = await fetch("/api/contacts");
-    const data = await res.json();
-    setContacts(data);
-    setLoading(false);
-  }
-
-  useEffect(() => { fetchContacts(); }, []);
-
-  const filtered = useMemo(() => {
+  const filtered = contacts.filter((c) => {
     const q = search.toLowerCase().trim();
-    if (!q) return contacts;
-    return contacts.filter((c) =>
-      `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q)
-    );
-  }, [contacts, search]);
+    if (!q) return true;
+    return `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q);
+  });
 
   const selected = contacts.find((c) => c.id === selectedId) ?? null;
 
   async function handleSaveContact(data: ContactFormDTO) {
-    const isEdit = !!contactModal.contact;
-    const url = isEdit ? `/api/contacts/${contactModal.contact!.id}` : "/api/contacts";
-    const res = await fetch(url, {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const saved = await res.json();
+    if (contactModal.contact) {
+      await update(contactModal.contact.id, data);
+    } else {
+      const saved = await create(data);
+      setSelectedId(saved.id);
+    }
     setContactModal({ open: false });
-    await fetchContacts();
-    if (!isEdit) setSelectedId(saved.id);
+    await refresh();
   }
 
   async function handleDeleteContact(id: string) {
     if (!confirm("Supprimer ce contact et toutes ses locations ?")) return;
-    await fetch(`/api/contacts/${id}`, { method: "DELETE" });
+    await remove(id);
     if (selectedId === id) setSelectedId(null);
-    await fetchContacts();
+    await refresh();
   }
 
   return (
@@ -70,7 +56,6 @@ export default function Home() {
         </div>
 
         <div className="grid">
-          {/* Panneau gauche */}
           <div className="panel">
             <div className="panel-header">
               <span className="panel-title">Contacts</span>
@@ -89,22 +74,17 @@ export default function Home() {
             {loading ? (
               <div className="empty-state">Chargement...</div>
             ) : (
-              <ContactList
-                contacts={filtered}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-              />
+              <ContactList contacts={filtered} selectedId={selectedId} onSelect={setSelectedId} />
             )}
           </div>
 
-          {/* Panneau droit */}
           <div id="detail-area">
             {selected ? (
               <ContactDetail
                 contact={selected}
                 onEdit={() => setContactModal({ open: true, contact: selected })}
                 onDelete={() => handleDeleteContact(selected.id)}
-                onRefresh={fetchContacts}
+                onRefresh={refresh}
               />
             ) : (
               <div className="empty-state panel" style={{ padding: "3rem", textAlign: "center" }}>
