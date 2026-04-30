@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { Contact, Location, LocationFormData } from "@/lib/types";
-import { calcLocation, fmtDate, money } from "@/lib/types";
+import { calcLocation, fmtDate, money } from "@/lib/utils";
 import { LocationModal } from "./modals/LocationModal";
+import { ContactDTO } from "@/dto/contact.dto";
+import { LocationDTO, LocationFormDTO } from "@/dto/location.dto";
 
 type Props = {
-  contact: Contact;
+  contact: ContactDTO;
   onEdit: () => void;
   onDelete: () => void;
   onRefresh: () => void;
@@ -17,10 +18,10 @@ function initials(p: string, n: string) {
 }
 
 export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
-  const [locationModal, setLocationModal] = useState<{ open: boolean; location?: Location }>({ open: false });
+  const [locationModal, setLocationModal] = useState<{ open: boolean; location?: LocationDTO }>({ open: false });
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
 
-  async function handleSaveLocation(data: LocationFormData, locId?: string) {
+  async function handleSaveLocation(data: LocationFormDTO, locId?: string) {
     const url = locId
       ? `/api/contacts/${contact.id}/locations/${locId}`
       : `/api/contacts/${contact.id}/locations`;
@@ -39,7 +40,7 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
     onRefresh();
   }
 
-  async function handleDownloadPDF(loc: Location) {
+  async function handleDownloadPDF(loc: LocationDTO) {
     setPdfLoading(loc.id);
     try {
       const res = await fetch(`/api/contacts/${contact.id}/locations/${loc.id}/pdf`);
