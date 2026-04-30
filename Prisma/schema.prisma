@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String   // bcrypt hash
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contact {
+  id        String     @id @default(cuid())
+  prenom    String
+  nom       String
+  email     String?
+  telephone String?
+  adresse   String?
+  locations Location[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Location {
+  id          String   @id @default(cuid())
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  dateArrivee DateTime
+  depart      DateTime
+  adultes     Int      @default(1)
+  enfants     Int      @default(0)
+  animaux     Int      @default(0)
+  prixBase    Decimal  @db.Decimal(10, 2)
+  taxeParNuit Decimal  @db.Decimal(10, 2) @default(0)
+  frais       Decimal  @db.Decimal(10, 2) @default(0)
+  acompte     Decimal  @db.Decimal(10, 2) @default(0)
+  caution     Decimal  @db.Decimal(10, 2) @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
