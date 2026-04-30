@@ -2,16 +2,16 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
-import type { Contact, ContactFormData } from "@/lib/types";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
+import { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
 
 export default function Home() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contacts, setContacts] = useState<ContactDTO[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [contactModal, setContactModal] = useState<{ open: boolean; contact?: Contact }>({ open: false });
+  const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
   const [loading, setLoading] = useState(true);
 
   async function fetchContacts() {
@@ -33,7 +33,7 @@ export default function Home() {
 
   const selected = contacts.find((c) => c.id === selectedId) ?? null;
 
-  async function handleSaveContact(data: ContactFormData) {
+  async function handleSaveContact(data: ContactFormDTO) {
     const isEdit = !!contactModal.contact;
     const url = isEdit ? `/api/contacts/${contactModal.contact!.id}` : "/api/contacts";
     const res = await fetch(url, {

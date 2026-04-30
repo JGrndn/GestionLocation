@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Location, LocationFormData } from "@/lib/types";
-import { calcLocation } from "@/lib/types";
+import { calcLocation } from "@/lib/utils";
+import { LocationDTO, LocationFormDTO } from "@/dto/location.dto";
 
 type Props = {
-  location?: Location;
+  location?: LocationDTO;
   contactName: string;
   onClose: () => void;
-  onSave: (data: LocationFormData) => Promise<void>;
+  onSave: (data: LocationFormDTO) => Promise<void>;
 };
 
-const empty: LocationFormData = {
+const empty: LocationFormDTO = {
   dateArrivee: "",
   depart: "",
   adultes: "1",
@@ -25,7 +25,7 @@ const empty: LocationFormData = {
 };
 
 export function LocationModal({ location, contactName, onClose, onSave }: Props) {
-  const [form, setForm] = useState<LocationFormData>(
+  const [form, setForm] = useState<LocationFormDTO>(
     location
       ? {
           dateArrivee: location.dateArrivee.slice(0, 10),
@@ -43,7 +43,7 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
   );
   const [loading, setLoading] = useState(false);
 
-  const set = (k: keyof LocationFormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof LocationFormDTO) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   // Calculs dérivés

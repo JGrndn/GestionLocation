@@ -1,16 +1,16 @@
 "use client";
 
+import { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
 import { useState } from "react";
-import type { Contact, ContactFormData } from "@/lib/types";
 
 type Props = {
-  contact?: Contact;
+  contact?: ContactDTO;
   onClose: () => void;
-  onSave: (data: ContactFormData) => Promise<void>;
+  onSave: (data: ContactFormDTO) => Promise<void>;
 };
 
 export function ContactModal({ contact, onClose, onSave }: Props) {
-  const [form, setForm] = useState<ContactFormData>({
+  const [form, setForm] = useState<ContactFormDTO>({
     prenom: contact?.prenom ?? "",
     nom: contact?.nom ?? "",
     email: contact?.email ?? "",
@@ -19,7 +19,7 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
   });
   const [loading, setLoading] = useState(false);
 
-  const set = (k: keyof ContactFormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof ContactFormDTO) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function handleSubmit() {
