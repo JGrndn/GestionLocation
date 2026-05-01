@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
 
   // Blocks
   section: { marginBottom: 12 },
-  sectionTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", textDecoration: "underline", marginBottom: 6, textTransform: "uppercase" },
+  sectionTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", textDecoration: "underline", marginBottom: 6, /*textTransform: "uppercase"*/ },
 
   // Inline row: label + value
   row: { flexDirection: "row", flexWrap: "wrap", marginBottom: 3 },
@@ -26,11 +26,11 @@ const styles = StyleSheet.create({
   col: { flex: 1 },
 
   // Separator
-  divider: { borderBottomWidth: 0.5, borderBottomColor: "#ccc", marginVertical: 10 },
+  divider: { borderBottomWidth: 0, borderBottomColor: "#ccc", marginVertical: 3 },
 
   // Signature block
-  sigBlock: { flexDirection: "row", marginTop: 30, gap: 20 },
-  sigBox: { flex: 1, borderWidth: 0.5, borderColor: "#aaa", borderRadius: 4, padding: 10, minHeight: 80 },
+  sigBlock: { flexDirection: "row", marginTop: 15, gap: 20 },
+  sigBox: { flex: 1, borderWidth: 0, borderColor: "#aaa", borderRadius: 4, padding: 5, minHeight: 80 },
   sigLabel: { fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 4 },
   sigSub: { fontSize: 8, color: MUTED, marginBottom: 20 },
 
@@ -198,8 +198,6 @@ export function LocationDocument({ contact, location }: Props) {
             <Text style={styles.sigSub}>Signature précédée de la mention "Lu et approuvé"</Text>
           </View>
         </View>
-
-        <Text style={styles.footer}>LocGérer — Document confidentiel</Text>
       </Page>
 
       {/* ── PAGES 2 & 3 : CONDITIONS GÉNÉRALES — paysage 2 colonnes ── */}
@@ -228,7 +226,7 @@ export function LocationDocument({ contact, location }: Props) {
               <Text style={styles.cgText}>
                 La présente location est consentie et acceptée pour une durée de <Text style={{ fontFamily: "Helvetica-Bold" }}>{n} nuit{n > 1 ? "s" : ""}</Text> à compter du <Text style={{ fontFamily: "Helvetica-Bold" }}>{fmt(location.dateArrivee)}</Text> à 16h00 pour se terminer le <Text style={{ fontFamily: "Helvetica-Bold" }}>{fmt(location.depart)}</Text> à 10h00.{"\n"}
                 En aucun cas elle ne pourra être prorogée, sauf accord préalable et écrit du propriétaire. Le contrat initial ou le contrat prorogé ne pourront porter la durée de la location à plus de quatre-vingt jours maximum.{"\n"}
-                Pour la prise de possession des lieux et les formalités d'usage, il est convenu d'un rendez-vous le <Text style={{ fontFamily: "Helvetica-Bold" }}>{fmt(location.dateArrivee)}</Text> à 16 heures. Ces rendez-vous pourront être modifiés en cas de force majeure.
+                Pour la prise de possession des lieux et les formalités d'usage (état des lieux, inventaire, remise des clés, paiement des sommes prévues à cette date), il est convenu d'un rendez-vous le <Text style={{ fontFamily: "Helvetica-Bold" }}>{fmt(location.dateArrivee)}</Text> à 16 heures. Ces rendez-vous pourront être modifiés à condition que les deux parties en soient dûment informées.
               </Text>
             </View>
 
@@ -242,11 +240,18 @@ export function LocationDocument({ contact, location }: Props) {
             <View style={styles.cgSection}>
               <Text style={styles.cgSectionTitle}>Dépôt de garantie :</Text>
               <Text style={styles.cgText}>
-                Le locataire versera le jour de l'entrée dans les lieux la somme de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(caution)} euros</Text> par chèque. Cette somme sera restituée dès la preuve que :{"\n"}
+                A titre de dépôt de garantie et en cautionnement des dégâts qui pourraient être causés au local ou bien au mobilier et/ou aux objets garnissant les lieux, le locataire versera le jour de l'entrée dans les lieux la somme de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(caution)} euros</Text> par chèque. Cette somme sera restituée dès la preuve que :{"\n"}
               </Text>
-              <Text style={styles.cgBullet}>• Aucun meuble, objet ou linge n'est absent, dégradé ni sali.</Text>
-              <Text style={styles.cgBullet}>• Les lieux n'ont subi aucune dégradation et sont remis en état propre.</Text>
+              <Text style={styles.cgBullet}>• Aucun meuble, objet ou linge n'est absent, dégradé ni sali ou bien, si tel est le cas, sa remise en état ou son remplacement par l'identique est convenu avec le propriétaire qui l'a accepté.</Text>
+              <Text style={styles.cgBullet}>• Les lieux n'ont subi aucune dégradation et sont remis en état propre (placards, poubelles et réfrigérateurs vides de déchets, sanitaires, appareils électroménagers, vaisselle, etc.)</Text>
               <Text style={{ ...styles.cgText, marginTop: 4 }}>Si ce dépôt s'avérait insuffisant, le locataire s'engage à en parfaire la somme.</Text>
+            </View>
+
+            <View style={styles.cgSection}>
+              <Text style={styles.cgSectionTitle}>Assurance :</Text>
+              <Text style={styles.cgText}>
+                Le locataire s'engage à s'assurer contre les risques locatifs (incendie, dégât des eaux). Le défaut d'assurance donnera lieu à des dommages et intérêts. Le locataire doit signaler tout sinistre dans les 24h et fournir une attestation de responsabilité civile 48h avant l'entrée dans les lieux, sous peine d'annulation sans remboursement des arrhes.
+              </Text>
             </View>
           </View>
 
@@ -255,26 +260,22 @@ export function LocationDocument({ contact, location }: Props) {
 
           {/* COLONNE DROITE */}
           <View style={styles.cgCol}>
-            <View style={styles.cgSection}>
-              <Text style={styles.cgSectionTitle}>Assurance :</Text>
-              <Text style={styles.cgText}>
-                Le locataire s'engage à s'assurer contre les risques locatifs (incendie, dégât des eaux). Le défaut d'assurance donnera lieu à des dommages et intérêts. Le locataire doit signaler tout sinistre dans les 24h et fournir une attestation de responsabilité civile 48h avant l'entrée dans les lieux, sous peine d'annulation sans remboursement des arrhes.
-              </Text>
-            </View>
-
+            
             <View style={styles.cgSection}>
               <Text style={styles.cgSectionTitle}>Échéancier de paiement :</Text>
               <Text style={styles.cgText}>
                 Le jour de la signature : <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(acompte)} euros</Text> d'acompte.{"\n"}
-                48h avant l'entrée : solde de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(solde)} euros</Text> + taxe de séjour de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(taxeParNuit)} €</Text>/adulte/nuit soit <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(taxeTotale)} euros</Text> au total.
+                48h avant l'entrée, par virement bancaire : solde de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(solde)} euros</Text> + taxe de séjour de <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(taxeParNuit)} €</Text>/adulte/nuit soit <Text style={{ fontFamily: "Helvetica-Bold" }}>{m(taxeTotale)} euros</Text> au total.
+                La réservation sera effective à la réception du virement et des présentes.
               </Text>
             </View>
 
             <View style={styles.cgSection}>
               <Text style={styles.cgSectionTitle}>Clause pénale - arrhes :</Text>
+              <Text style={styles.cgText}>Il est convenu qu'en cas de désistement</Text>
               <Text style={{ ...styles.cgText, fontFamily: "Helvetica-Bold" }}>Du locataire :</Text>
-              <Text style={styles.cgBullet}>• À plus de 3 semaines : perte des arrhes versées.</Text>
-              <Text style={styles.cgBullet}>• À moins de 3 semaines : versement de la différence jusqu'au loyer total.</Text>
+              <Text style={styles.cgBullet}>• À plus de 3 semaines : le locataire perd les arrhes versées</Text>
+              <Text style={styles.cgBullet}>• À moins de 3 semaines avant la prise d'effet de la location : le locataire versera en outre la différence entre les arrhes et l'équivalent du loyer total</Text>
               <Text style={{ ...styles.cgText, fontFamily: "Helvetica-Bold", marginTop: 4 }}>Du propriétaire :</Text>
               <Text style={styles.cgBullet}>• Restitution des arrhes dans les 7 jours suivant le désistement.</Text>
             </View>
@@ -294,10 +295,10 @@ export function LocationDocument({ contact, location }: Props) {
                 "à jouir paisiblement des lieux sans trouble ni nuisance",
                 "à ne pas sous-louer ni céder le contrat à un tiers",
                 "à signaler tout dégât dans les plus brefs délais",
-                "à respecter la destination de l'habitation",
-                "à autoriser les réparations urgentes",
+                "à respecter la destination de l'habitation et à ne lui apporter aucune modification",
+                "à autoriser le propriétaire ou un tiers mandaté par lui à effectuer, pendant la durée de la location, toute réparation commandée par l’urgence en renonçant par avance à prétendre à une quelconque indemnité ou réduction du loyer de ce chef",
                 "à respecter les modalités de remise des clefs",
-                "à laisser les lieux propres à son départ",
+                "à laisser les lieux propres à son départ et libre de tout rebut ou déchet. A défaut, le locataire est informé que le ménage sera effectué par un tiers à ses frais",
               ].map((item, i) => (
                 <Text style={styles.cgBullet} key={i}>• {item}</Text>
               ))}
@@ -316,8 +317,6 @@ export function LocationDocument({ contact, location }: Props) {
             </View>
           </View>
         </View>
-
-        <Text style={styles.footer}>LocGérer — Document confidentiel</Text>
       </Page>
     </Document>
   );
