@@ -11,6 +11,13 @@ export const locationService = {
     return locations.map(toLocationDTO);
   },
 
+  async findForPdf(locId: string) {
+    return prisma.location.findUnique({
+      where: { id: locId },
+      include: { contact: true },
+    });
+  },
+
   async create(contactId: string, body: LocationFormDTO) {
     const location = await prisma.location.create({
       data: { contactId, ...fromLocationFormDTO(body) },
@@ -28,9 +35,5 @@ export const locationService = {
 
   async delete(locId: string) {
     await prisma.location.delete({ where: { id: locId } });
-  },
-
-  async findRawForPdf(locId: string) {
-    return prisma.location.findUnique({ where: { id: locId } });
   },
 };

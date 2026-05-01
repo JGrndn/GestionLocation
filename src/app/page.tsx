@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
 import { useContacts } from "@/hooks/contact.hook";
 import type { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
@@ -10,33 +10,46 @@ import { ContactModal } from "@/components/modals/ContactModal";
 
 export default function Home() {
   const { contacts, loading, refresh, create, update, remove } = useContacts();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ContactDTO | null>(null);
   const [search, setSearch] = useState("");
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
 
-  const filtered = contacts.filter((c) => {
-    const q = search.toLowerCase().trim();
-    if (!q) return true;
-    return `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q);
-  });
+  async function handleSelect(id: string) {
+    const res = await fetch(`/api/contacts/${id}`);
+    setSelected(await res.json());
+  }
 
-  const selected = contacts.find((c) => c.id === selectedId) ?? null;
+  async function refreshSelected() {
+    if (!selected) return;
+    const res = await fetch(`/api/contacts/${selected.id}`);
+    setSelected(await res.json());
+  }
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return contacts;
+    return contacts.filter((c) =>
+      `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q)
+    );
+  }, [contacts, search]);
 
   async function handleSaveContact(data: ContactFormDTO) {
-    if (contactModal.contact) {
-      await update(contactModal.contact.id, data);
+    const isEdit = !!contactModal.contact;
+    if (isEdit) {
+      await update(contactModal.contact!.id, data);
     } else {
       const saved = await create(data);
-      setSelectedId(saved.id);
+      await handleSelect(saved.id);
     }
     setContactModal({ open: false });
     await refresh();
+    if (isEdit) await refreshSelected();
   }
 
   async function handleDeleteContact(id: string) {
     if (!confirm("Supprimer ce contact et toutes ses locations ?")) return;
     await remove(id);
-    if (selectedId === id) setSelectedId(null);
+    if (selected?.id === id) setSelected(null);
     await refresh();
   }
 
@@ -74,7 +87,11 @@ export default function Home() {
             {loading ? (
               <div className="empty-state">Chargement...</div>
             ) : (
-              <ContactList contacts={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+              <ContactList
+                contacts={filtered}
+                selectedId={selected?.id ?? null}
+                onSelect={handleSelect}
+              />
             )}
           </div>
 
@@ -84,7 +101,7 @@ export default function Home() {
                 contact={selected}
                 onEdit={() => setContactModal({ open: true, contact: selected })}
                 onDelete={() => handleDeleteContact(selected.id)}
-                onRefresh={refresh}
+                onRefresh={refreshSelected}
               />
             ) : (
               <div className="empty-state panel" style={{ padding: "3rem", textAlign: "center" }}>
