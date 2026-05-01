@@ -15,6 +15,8 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
+  // "list" | "detail" — mobile only
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
 
   useEffect(() => {
     fetchAll().then((data) => {
@@ -26,6 +28,12 @@ export default function Home() {
   async function handleSelect(id: string) {
     const data = await fetchOne(id);
     setSelected(data);
+    setMobileView("detail");
+  }
+
+  function handleBack() {
+    setMobileView("list");
+    setSelected(null);
   }
 
   async function refreshSelected() {
@@ -55,6 +63,7 @@ export default function Home() {
       const full = await fetchOne(saved.id);
       setContacts((prev) => [...prev, saved].sort((a, b) => a.nom.localeCompare(b.nom)));
       setSelected(full);
+      setMobileView("detail");
     }
   }
 
@@ -62,7 +71,10 @@ export default function Home() {
     if (!confirm("Supprimer ce contact et toutes ses locations ?")) return;
     await remove(id);
     setContacts((prev) => prev.filter((c) => c.id !== id));
-    if (selected?.id === id) setSelected(null);
+    if (selected?.id === id) {
+      setSelected(null);
+      setMobileView("list");
+    }
   }
 
   return (
@@ -70,7 +82,7 @@ export default function Home() {
       <div className="app">
         <div className="topbar">
           <div className="logo">Loc<span>Gérer</span></div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="topbar-actions">
             <button className="btn primary" onClick={() => setContactModal({ open: true })}>
               + Nouveau contact
             </button>
@@ -81,10 +93,11 @@ export default function Home() {
         </div>
 
         <div className="grid">
-          <div className="panel">
+          {/* Liste — cachée sur mobile quand on est en vue détail */}
+          <div className={`panel${mobileView === "detail" ? " hidden-mobile" : ""}`}>
             <div className="panel-header">
               <span className="panel-title">Contacts</span>
-              <span style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 {contacts.length} contact{contacts.length > 1 ? "s" : ""}
               </span>
             </div>
@@ -107,14 +120,20 @@ export default function Home() {
             )}
           </div>
 
-          <div id="detail-area">
+          {/* Détail — caché sur mobile quand on est en vue liste */}
+          <div id="detail-area" className={mobileView === "list" ? "hidden-mobile" : ""}>
             {selected ? (
-              <ContactDetail
-                contact={selected}
-                onEdit={() => setContactModal({ open: true, contact: selected })}
-                onDelete={() => handleDeleteContact(selected.id)}
-                onRefresh={refreshSelected}
-              />
+              <>
+                <button className="back-btn" onClick={handleBack}>
+                  ← Retour
+                </button>
+                <ContactDetail
+                  contact={selected}
+                  onEdit={() => setContactModal({ open: true, contact: selected })}
+                  onDelete={() => handleDeleteContact(selected.id)}
+                  onRefresh={refreshSelected}
+                />
+              </>
             ) : (
               <div className="empty-state panel" style={{ padding: "3rem", textAlign: "center" }}>
                 <p style={{ fontSize: 32, marginBottom: "0.5rem" }}>🏠</p>
