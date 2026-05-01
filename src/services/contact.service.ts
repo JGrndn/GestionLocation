@@ -11,6 +11,13 @@ export const contactService = {
     return contacts.map(toContactDTO);
   },
 
+  async findAllLight() {
+    const contacts = await prisma.contact.findMany({
+      orderBy: { nom: 'asc' },
+    });
+    return contacts;
+  },
+
   async findById(id: string) {
     const contact = await prisma.contact.findUnique({
       where: { id },

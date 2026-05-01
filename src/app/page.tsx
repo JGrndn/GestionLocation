@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
 import { useContacts } from "@/hooks/contact.hook";
 import type { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
@@ -9,35 +9,60 @@ import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
 
 export default function Home() {
-  const { contacts, loading, refresh, create, update, remove } = useContacts();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { fetchAll, fetchOne, create, update, remove } = useContacts();
+  const [contacts, setContacts] = useState<ContactDTO[]>([]);
+  const [selected, setSelected] = useState<ContactDTO | null>(null);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
 
-  const filtered = contacts.filter((c) => {
-    const q = search.toLowerCase().trim();
-    if (!q) return true;
-    return `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q);
-  });
+  useEffect(() => {
+    fetchAll().then((data) => {
+      setContacts(data);
+      setLoading(false);
+    });
+  }, []);
 
-  const selected = contacts.find((c) => c.id === selectedId) ?? null;
+  async function handleSelect(id: string) {
+    const data = await fetchOne(id);
+    setSelected(data);
+  }
+
+  async function refreshSelected() {
+    if (!selected) return;
+    const data = await fetchOne(selected.id);
+    setSelected(data);
+  }
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return contacts;
+    return contacts.filter((c) =>
+      `${c.prenom} ${c.nom} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(q)
+    );
+  }, [contacts, search]);
 
   async function handleSaveContact(data: ContactFormDTO) {
-    if (contactModal.contact) {
-      await update(contactModal.contact.id, data);
+    const isEdit = !!contactModal.contact;
+    setContactModal({ open: false });
+
+    if (isEdit) {
+      const updated = await update(contactModal.contact!.id, data);
+      setContacts((prev) => prev.map((c) => c.id === updated.id ? updated : c));
+      setSelected((prev) => prev?.id === updated.id ? { ...prev, ...updated } : prev);
     } else {
       const saved = await create(data);
-      setSelectedId(saved.id);
+      const full = await fetchOne(saved.id);
+      setContacts((prev) => [...prev, saved].sort((a, b) => a.nom.localeCompare(b.nom)));
+      setSelected(full);
     }
-    setContactModal({ open: false });
-    await refresh();
   }
 
   async function handleDeleteContact(id: string) {
     if (!confirm("Supprimer ce contact et toutes ses locations ?")) return;
     await remove(id);
-    if (selectedId === id) setSelectedId(null);
-    await refresh();
+    setContacts((prev) => prev.filter((c) => c.id !== id));
+    if (selected?.id === id) setSelected(null);
   }
 
   return (
@@ -74,7 +99,11 @@ export default function Home() {
             {loading ? (
               <div className="empty-state">Chargement...</div>
             ) : (
-              <ContactList contacts={filtered} selectedId={selectedId} onSelect={setSelectedId} />
+              <ContactList
+                contacts={filtered}
+                selectedId={selected?.id ?? null}
+                onSelect={handleSelect}
+              />
             )}
           </div>
 
@@ -84,7 +113,7 @@ export default function Home() {
                 contact={selected}
                 onEdit={() => setContactModal({ open: true, contact: selected })}
                 onDelete={() => handleDeleteContact(selected.id)}
-                onRefresh={refresh}
+                onRefresh={refreshSelected}
               />
             ) : (
               <div className="empty-state panel" style={{ padding: "3rem", textAlign: "center" }}>

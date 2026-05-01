@@ -1,40 +1,38 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
 import type { ContactDTO, ContactFormDTO } from '@/dto/contact.dto';
 
 export function useContacts() {
-  const [contacts, setContacts] = useState<ContactDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  async function refresh() {
+  async function fetchAll(): Promise<ContactDTO[]> {
     const res = await fetch('/api/contacts');
-    setContacts(await res.json());
-    setLoading(false);
+    return res.json();
   }
 
-  useEffect(() => { refresh(); }, []);
+  async function fetchOne(id: string): Promise<ContactDTO> {
+    const res = await fetch(`/api/contacts/${id}`);
+    return res.json();
+  }
 
-  async function create(data: ContactFormDTO) {
+  async function create(data: ContactFormDTO): Promise<ContactDTO> {
     const res = await fetch('/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    return res.json() as Promise<ContactDTO>;
+    return res.json();
   }
 
-  async function update(id: string, data: ContactFormDTO) {
+  async function update(id: string, data: ContactFormDTO): Promise<ContactDTO> {
     const res = await fetch(`/api/contacts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    return res.json() as Promise<ContactDTO>;
+    return res.json();
   }
 
-  async function remove(id: string) {
+  async function remove(id: string): Promise<void> {
     await fetch(`/api/contacts/${id}`, { method: 'DELETE' });
   }
 
-  return { contacts, loading, refresh, create, update, remove };
+  return { fetchAll, fetchOne, create, update, remove };
 }
