@@ -15,17 +15,3 @@ export type LocationDTO = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type LocationFormDTO = {
-  dateArrivee: string;
-  depart: string;
-  adultes: string;
-  enfants: string;
-  animaux: string;
-  prixBase: string;
-  taxeParNuit: string;
-  frais: string;
-  acompte: string;
-  caution: string;
-  langue: string; // "fr" | "en"
-};

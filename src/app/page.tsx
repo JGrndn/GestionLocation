@@ -3,10 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
 import { useContacts } from "@/hooks/contact.hook";
-import type { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
+import type { ContactDTO } from "@/dto/contact.dto";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
+import { ContactInput } from "@/lib/schema";
 
 export default function Home() {
   const { fetchAll, fetchOne, create, update, remove } = useContacts();
@@ -50,7 +51,7 @@ export default function Home() {
     );
   }, [contacts, search]);
 
-  async function handleSaveContact(data: ContactFormDTO) {
+  async function handleSaveContact(data: ContactInput) {
     const isEdit = !!contactModal.contact;
     setContactModal({ open: false });
 

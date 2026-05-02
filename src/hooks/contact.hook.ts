@@ -1,5 +1,6 @@
 'use client';
-import type { ContactDTO, ContactFormDTO } from '@/dto/contact.dto';
+import type { ContactDTO } from '@/dto/contact.dto';
+import type { ContactInput } from '@/lib/schema';
 
 export function useContacts() {
   async function fetchAll(): Promise<ContactDTO[]> {
@@ -12,7 +13,7 @@ export function useContacts() {
     return res.json();
   }
 
-  async function create(data: ContactFormDTO): Promise<ContactDTO> {
+  async function create(data: ContactInput): Promise<ContactDTO> {
     const res = await fetch('/api/contacts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -21,7 +22,7 @@ export function useContacts() {
     return res.json();
   }
 
-  async function update(id: string, data: ContactFormDTO): Promise<ContactDTO> {
+  async function update(id: string, data: ContactInput): Promise<ContactDTO> {
     const res = await fetch(`/api/contacts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

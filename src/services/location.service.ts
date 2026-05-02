@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { fromLocationFormDTO, toLocationDTO } from '@/mappers/location.mapper';
-import type { LocationFormDTO } from '@/dto/location.dto';
+import { fromLocationInput, toLocationDTO } from '@/mappers/location.mapper';
+import type { LocationInput } from '@/lib/schema';
 
 export const locationService = {
   async findAllForContact(contactId: string) {
@@ -18,17 +18,17 @@ export const locationService = {
     });
   },
 
-  async create(contactId: string, body: LocationFormDTO) {
+  async create(contactId: string, body: LocationInput) {
     const location = await prisma.location.create({
-      data: { contactId, ...fromLocationFormDTO(body) },
+      data: { contactId, ...fromLocationInput(body) },
     });
     return toLocationDTO(location);
   },
 
-  async update(locId: string, body: LocationFormDTO) {
+  async update(locId: string, body: LocationInput) {
     const location = await prisma.location.update({
       where: { id: locId },
-      data: fromLocationFormDTO(body),
+      data: fromLocationInput(body),
     });
     return toLocationDTO(location);
   },

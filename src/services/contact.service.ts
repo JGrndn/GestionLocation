@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { fromContactFormDTO, toContactDTO } from '@/mappers/contact.mapper';
-import type { ContactFormDTO } from '@/dto/contact.dto';
+import { fromContactInput, toContactDTO } from '@/mappers/contact.mapper';
+import type { ContactInput } from '@/lib/schema';
 
 export const contactService = {
   async findAll() {
@@ -26,18 +26,18 @@ export const contactService = {
     return contact ? toContactDTO(contact) : null;
   },
 
-  async create(body: ContactFormDTO) {
+  async create(body: ContactInput) {
     const contact = await prisma.contact.create({
-      data: fromContactFormDTO(body),
+      data: fromContactInput(body),
       include: { locations: true },
     });
     return toContactDTO(contact);
   },
 
-  async update(id: string, body: ContactFormDTO) {
+  async update(id: string, body: ContactInput) {
     const contact = await prisma.contact.update({
       where: { id },
-      data: fromContactFormDTO(body),
+      data: fromContactInput(body),
       include: { locations: { orderBy: { dateArrivee: 'desc' } } },
     });
     return toContactDTO(contact);

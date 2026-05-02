@@ -1,16 +1,26 @@
 "use client";
 
-import { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
+import { ContactDTO } from "@/dto/contact.dto";
+import { ContactInput } from "@/lib/schema";
 import { useState } from "react";
+
+// Formulaire en strings pour les inputs HTML
+type ContactForm = {
+  prenom: string;
+  nom: string;
+  email: string;
+  telephone: string;
+  adresse: string;
+};
 
 type Props = {
   contact?: ContactDTO;
   onClose: () => void;
-  onSave: (data: ContactFormDTO) => Promise<void>;
+  onSave: (data: ContactInput) => Promise<void>;
 };
 
 export function ContactModal({ contact, onClose, onSave }: Props) {
-  const [form, setForm] = useState<ContactFormDTO>({
+  const [form, setForm] = useState<ContactForm>({
     prenom: contact?.prenom ?? "",
     nom: contact?.nom ?? "",
     email: contact?.email ?? "",
@@ -19,7 +29,7 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
   });
   const [loading, setLoading] = useState(false);
 
-  const set = (k: keyof ContactFormDTO) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof ContactForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function handleSubmit() {

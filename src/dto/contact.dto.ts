@@ -11,11 +11,3 @@ export type ContactDTO = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type ContactFormDTO = {
-  prenom: string;
-  nom: string;
-  email: string;
-  telephone: string;
-  adresse: string;
-};

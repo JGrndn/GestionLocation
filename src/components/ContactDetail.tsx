@@ -4,7 +4,8 @@ import { useState } from "react";
 import { calcLocation, fmtDate, money } from "@/lib/utils";
 import { LocationModal } from "./modals/LocationModal";
 import { ContactDTO } from "@/dto/contact.dto";
-import { LocationDTO, LocationFormDTO } from "@/dto/location.dto";
+import { LocationDTO } from "@/dto/location.dto";
+import { LocationInput } from "@/lib/schema";
 
 type Props = {
   contact: ContactDTO;
@@ -21,7 +22,7 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
   const [locationModal, setLocationModal] = useState<{ open: boolean; location?: LocationDTO }>({ open: false });
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
 
-  async function handleSaveLocation(data: LocationFormDTO, locId?: string) {
+  async function handleSaveLocation(data: LocationInput, locId?: string) {
     const url = locId
       ? `/api/contacts/${contact.id}/locations/${locId}`
       : `/api/contacts/${contact.id}/locations`;
@@ -57,7 +58,6 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
 
   return (
     <div className="detail-panel">
-      {/* Fiche contact */}
       <div className="contact-card">
         <div className="contact-card-header">
           <div className="avatar-lg">{initials(contact.prenom, contact.nom)}</div>
@@ -82,7 +82,6 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
         </div>
       </div>
 
-      {/* Locations */}
       <div className="locations-section panel">
         <div className="panel-header">
           <span className="panel-title">Locations ({contact.locations.length})</span>

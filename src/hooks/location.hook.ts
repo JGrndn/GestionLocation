@@ -1,8 +1,8 @@
 'use client';
-import type { LocationFormDTO } from '@/dto/location.dto';
+import type { LocationInput } from '@/lib/schema';
 
 export function useLocations(contactId: string) {
-  async function create(data: LocationFormDTO) {
+  async function create(data: LocationInput) {
     await fetch(`/api/contacts/${contactId}/locations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -10,7 +10,7 @@ export function useLocations(contactId: string) {
     });
   }
 
-  async function update(locId: string, data: LocationFormDTO) {
+  async function update(locId: string, data: LocationInput) {
     await fetch(`/api/contacts/${contactId}/locations/${locId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

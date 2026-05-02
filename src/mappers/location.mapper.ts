@@ -1,5 +1,6 @@
 import type { Location } from '@/generated/prisma/client';
-import type { LocationDTO, LocationFormDTO } from '@/dto/location.dto';
+import type { LocationDTO } from '@/dto/location.dto';
+import type { LocationInput } from '@/lib/schema';
 
 export function toLocationDTO(loc: Location): LocationDTO {
   return {
@@ -21,18 +22,18 @@ export function toLocationDTO(loc: Location): LocationDTO {
   };
 }
 
-export function fromLocationFormDTO(body: LocationFormDTO) {
+export function fromLocationInput(body: LocationInput) {
   return {
     dateArrivee: new Date(body.dateArrivee),
     depart: new Date(body.depart),
-    adultes: parseInt(body.adultes) || 1,
-    enfants: parseInt(body.enfants) || 0,
-    animaux: parseInt(body.animaux) || 0,
-    prixBase: parseFloat(body.prixBase) || 0,
-    taxeParNuit: parseFloat(body.taxeParNuit) || 0,
-    frais: parseFloat(body.frais) || 0,
-    acompte: parseFloat(body.acompte) || 0,
-    caution: parseFloat(body.caution) || 0,
+    adultes: body.adultes || 1,
+    enfants: body.enfants || 0,
+    animaux: body.animaux || 0,
+    prixBase: body.prixBase || 0,
+    taxeParNuit: body.taxeParNuit || 0,
+    frais: body.frais || 0,
+    acompte: body.acompte || 0,
+    caution: body.caution || 0,
     langue: body.langue ?? 'fr',
   };
 }
