@@ -15,6 +15,12 @@ export async function POST(req: Request, { params }: Params) {
   if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
   const body = await req.json();
-  const parsed = LocationSchema.parse(body);
-  return NextResponse.json(await locationService.create(id, parsed), { status: 201 });
+  const parsed = LocationSchema.safeParse(body);
+  if (!parsed.success){
+    return NextResponse.json(
+      { error: 'Validation échouée', details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  return NextResponse.json(await locationService.create(id, parsed.data), { status: 201 });
 }

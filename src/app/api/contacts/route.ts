@@ -10,8 +10,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  
   const body = await req.json();
-  const parsed = ContactSchema.parse(body)
-  return NextResponse.json(await contactService.create(parsed), { status: 201 });
+  const parsed = ContactSchema.safeParse(body);
+  if (!parsed.success){
+    return NextResponse.json(
+      { error: 'Validation échouée', details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  return NextResponse.json(await contactService.create(parsed.data), { status: 201 });
 }

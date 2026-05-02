@@ -5,7 +5,6 @@ import { calcLocation } from "@/lib/utils";
 import { LocationDTO } from "@/dto/location.dto";
 import { LocationInput } from "@/lib/schema";
 
-// État local du formulaire : tout en strings pour les inputs HTML
 type LocationForm = {
   dateArrivee: string;
   depart: string;
@@ -24,7 +23,7 @@ type Props = {
   location?: LocationDTO;
   contactName: string;
   onClose: () => void;
-  onSave: (data: LocationInput) => Promise<void>;
+  onSave: (data: LocationInput) => Promise<string | null>;
 };
 
 const empty: LocationForm = {
@@ -60,6 +59,7 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
       : empty
   );
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const set = (k: keyof LocationForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -80,8 +80,9 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
   async function handleSubmit() {
     if (!form.dateArrivee || !form.depart) return;
     setLoading(true);
-    // z.coerce dans le schéma convertit les strings en numbers
-    await onSave(form as unknown as LocationInput);
+    setError(null);
+    const err = await onSave(form as unknown as LocationInput);
+    if (err) setError(err);
     setLoading(false);
   }
 
@@ -95,6 +96,7 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
+          {error && <div className="form-error">{error}</div>}
           <div className="form-grid">
             <div className="section-label">Séjour</div>
             <div className="form-group">

@@ -6,6 +6,7 @@ import { LocationModal } from "./modals/LocationModal";
 import { ContactDTO } from "@/dto/contact.dto";
 import { LocationDTO } from "@/dto/location.dto";
 import { LocationInput } from "@/lib/schema";
+import { handleResponse } from "@/hooks/contact.hook";
 
 type Props = {
   contact: ContactDTO;
@@ -22,17 +23,20 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
   const [locationModal, setLocationModal] = useState<{ open: boolean; location?: LocationDTO }>({ open: false });
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
 
-  async function handleSaveLocation(data: LocationInput, locId?: string) {
+  async function handleSaveLocation(data: LocationInput, locId?: string): Promise<string | null> {
     const url = locId
       ? `/api/contacts/${contact.id}/locations/${locId}`
       : `/api/contacts/${contact.id}/locations`;
-    await fetch(url, {
+    const res = await fetch(url, {
       method: locId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+    const result = await handleResponse(res);
+    if (!result.ok) return result.message;
     setLocationModal({ open: false });
     onRefresh();
+    return null;
   }
 
   async function handleDeleteLocation(locId: string) {
@@ -104,7 +108,6 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span className="badge">{money(prixTotal)}</span>
-
                     <button
                       className="btn sm pdf"
                       onClick={() => handleDownloadPDF(loc, "fr")}
@@ -112,7 +115,6 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                     >
                       {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
                     </button>
-
                     {loc.langue === "en" && (
                       <button
                         className="btn sm pdf"
@@ -122,7 +124,6 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                         {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
                       </button>
                     )}
-
                     <button className="btn sm" onClick={() => setLocationModal({ open: true, location: loc })}>
                       Modifier
                     </button>

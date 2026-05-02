@@ -4,7 +4,6 @@ import { ContactDTO } from "@/dto/contact.dto";
 import { ContactInput } from "@/lib/schema";
 import { useState } from "react";
 
-// Formulaire en strings pour les inputs HTML
 type ContactForm = {
   prenom: string;
   nom: string;
@@ -16,7 +15,7 @@ type ContactForm = {
 type Props = {
   contact?: ContactDTO;
   onClose: () => void;
-  onSave: (data: ContactInput) => Promise<void>;
+  onSave: (data: ContactInput) => Promise<string | null>;
 };
 
 export function ContactModal({ contact, onClose, onSave }: Props) {
@@ -28,6 +27,7 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
     adresse: contact?.adresse ?? "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const set = (k: keyof ContactForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -35,7 +35,9 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
   async function handleSubmit() {
     if (!form.prenom && !form.nom) return;
     setLoading(true);
-    await onSave(form);
+    setError(null);
+    const err = await onSave(form);
+    if (err) setError(err);
     setLoading(false);
   }
 
@@ -47,6 +49,7 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
+          {error && <div className="form-error">{error}</div>}
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Prénom</label>

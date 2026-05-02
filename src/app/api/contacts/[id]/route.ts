@@ -17,8 +17,14 @@ export async function PUT(req: Request, { params }: Params) {
   if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
   const body = await req.json();
-  const parsed = ContactSchema.parse(body)
-  return NextResponse.json(await contactService.update(id, parsed));
+  const parsed = ContactSchema.safeParse(body);
+  if (!parsed.success){
+    return NextResponse.json(
+      { error: 'Validation échouée', details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  return NextResponse.json(await contactService.update(id, parsed.data));
 }
 
 export async function DELETE(_req: Request, { params }: Params) {

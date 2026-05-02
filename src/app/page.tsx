@@ -4,10 +4,10 @@ import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
 import { useContacts } from "@/hooks/contact.hook";
 import type { ContactDTO } from "@/dto/contact.dto";
+import type { ContactInput } from "@/lib/schema";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
-import { ContactInput } from "@/lib/schema";
 
 export default function Home() {
   const { fetchAll, fetchOne, create, update, remove } = useContacts();
@@ -16,7 +16,6 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
-  // "list" | "detail" — mobile only
   const [mobileView, setMobileView] = useState<"list" | "detail">("list");
 
   useEffect(() => {
@@ -51,21 +50,25 @@ export default function Home() {
     );
   }, [contacts, search]);
 
-  async function handleSaveContact(data: ContactInput) {
+  async function handleSaveContact(data: ContactInput): Promise<string | null> {
     const isEdit = !!contactModal.contact;
-    setContactModal({ open: false });
 
     if (isEdit) {
-      const updated = await update(contactModal.contact!.id, data);
-      setContacts((prev) => prev.map((c) => c.id === updated.id ? updated : c));
-      setSelected((prev) => prev?.id === updated.id ? { ...prev, ...updated } : prev);
+      const result = await update(contactModal.contact!.id, data);
+      if (!result.ok) return result.message;
+      setContactModal({ open: false });
+      setContacts((prev) => prev.map((c) => c.id === result.data.id ? result.data : c));
+      setSelected((prev) => prev?.id === result.data.id ? { ...prev, ...result.data } : prev);
     } else {
-      const saved = await create(data);
-      const full = await fetchOne(saved.id);
-      setContacts((prev) => [...prev, saved].sort((a, b) => a.nom.localeCompare(b.nom)));
+      const result = await create(data);
+      if (!result.ok) return result.message;
+      setContactModal({ open: false });
+      const full = await fetchOne(result.data.id);
+      setContacts((prev) => [...prev, result.data].sort((a, b) => a.nom.localeCompare(b.nom)));
       setSelected(full);
       setMobileView("detail");
     }
+    return null;
   }
 
   async function handleDeleteContact(id: string) {
@@ -94,7 +97,6 @@ export default function Home() {
         </div>
 
         <div className="grid">
-          {/* Liste — cachée sur mobile quand on est en vue détail */}
           <div className={`panel${mobileView === "detail" ? " hidden-mobile" : ""}`}>
             <div className="panel-header">
               <span className="panel-title">Contacts</span>
@@ -121,13 +123,10 @@ export default function Home() {
             )}
           </div>
 
-          {/* Détail — caché sur mobile quand on est en vue liste */}
           <div id="detail-area" className={mobileView === "list" ? "hidden-mobile" : ""}>
             {selected ? (
               <>
-                <button className="back-btn" onClick={handleBack}>
-                  ← Retour
-                </button>
+                <button className="back-btn" onClick={handleBack}>← Retour</button>
                 <ContactDetail
                   contact={selected}
                   onEdit={() => setContactModal({ open: true, contact: selected })}

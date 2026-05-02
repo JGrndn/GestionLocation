@@ -11,7 +11,7 @@ export const ContactSchema = z.object({
 export const LocationSchema = z.object({
   dateArrivee: z.string().date('Date d\'arrivée invalide'),
   depart: z.string().date('Date de départ invalide'),
-  adultes: z.coerce.number().int().min(0).max(20),
+  adultes: z.coerce.number().int().min(1).max(20),
   enfants: z.coerce.number().int().min(0).max(20),
   animaux: z.coerce.number().int().min(0).max(10),
   prixBase: z.coerce.number().min(0).max(100000),
