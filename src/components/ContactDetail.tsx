@@ -40,20 +40,20 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
     onRefresh();
   }
 
-  async function handleDownloadPDF(loc: LocationDTO) {
-  setPdfLoading(loc.id);
-  try {
-    const res = await fetch(`/api/contacts/${contact.id}/locations/${loc.id}/pdf`);
-    if (!res.ok) throw new Error("Erreur génération PDF");
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    // Révocation différée pour laisser le temps au tab de charger
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-  } finally {
-    setPdfLoading(null);
+  async function handleDownloadPDF(loc: LocationDTO, lang: "fr" | "en" = "fr") {
+    const key = loc.id + "_" + lang;
+    setPdfLoading(key);
+    try {
+      const res = await fetch(`/api/contacts/${contact.id}/locations/${loc.id}/pdf?lang=${lang}`);
+      if (!res.ok) throw new Error("Erreur génération PDF");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } finally {
+      setPdfLoading(null);
+    }
   }
-}
 
   return (
     <div className="detail-panel">
@@ -105,13 +105,25 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span className="badge">{money(prixTotal)}</span>
+
                     <button
                       className="btn sm pdf"
-                      onClick={() => handleDownloadPDF(loc)}
-                      disabled={pdfLoading === loc.id}
+                      onClick={() => handleDownloadPDF(loc, "fr")}
+                      disabled={pdfLoading === loc.id + "_fr"}
                     >
-                      {pdfLoading === loc.id ? "Génération..." : "Ouvrir PDF"}
+                      {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
                     </button>
+
+                    {loc.langue === "en" && (
+                      <button
+                        className="btn sm pdf"
+                        onClick={() => handleDownloadPDF(loc, "en")}
+                        disabled={pdfLoading === loc.id + "_en"}
+                      >
+                        {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
+                      </button>
+                    )}
+
                     <button className="btn sm" onClick={() => setLocationModal({ open: true, location: loc })}>
                       Modifier
                     </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { calcLocation } from "@/lib/utils";
 import { LocationDTO, LocationFormDTO } from "@/dto/location.dto";
 
@@ -22,6 +22,7 @@ const empty: LocationFormDTO = {
   frais: "",
   acompte: "",
   caution: "",
+  langue: "fr",
 };
 
 export function LocationModal({ location, contactName, onClose, onSave }: Props) {
@@ -38,15 +39,15 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
           frais: String(location.frais),
           acompte: String(location.acompte),
           caution: String(location.caution),
+          langue: location.langue ?? "fr",
         }
       : empty
   );
   const [loading, setLoading] = useState(false);
 
-  const set = (k: keyof LocationFormDTO) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof LocationFormDTO) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  // Calculs dérivés
   const computed = (() => {
     if (!form.dateArrivee || !form.depart) return null;
     return calcLocation({
@@ -142,6 +143,17 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
             <div className="form-group">
               <label className="form-label">Solde à payer (€)</label>
               <input readOnly value={computed ? computed.solde.toFixed(2) : "0.00"} className="text-green" />
+            </div>
+
+            <hr className="sep" />
+            <div className="section-label">PDF</div>
+
+            <div className="form-group full">
+              <label className="form-label">Langue du contrat</label>
+              <select value={form.langue} onChange={set("langue")}>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="en">🇬🇧 English</option>
+              </select>
             </div>
           </div>
         </div>

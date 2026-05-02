@@ -1,7 +1,7 @@
 export type LocationDTO = {
   id: string;
   contactId: string;
-  dateArrivee: string;   // ISO string
+  dateArrivee: string;
   depart: string;
   adultes: number;
   enfants: number;
@@ -11,6 +11,7 @@ export type LocationDTO = {
   frais: number;
   acompte: number;
   caution: number;
+  langue: string; // "fr" | "en"
   createdAt: string;
   updatedAt: string;
 };
@@ -26,4 +27,5 @@ export type LocationFormDTO = {
   frais: string;
   acompte: string;
   caution: string;
+  langue: string; // "fr" | "en"
 };
