@@ -15,6 +15,7 @@ export function toLocationDTO(loc: Location): LocationDTO {
     frais: Number(loc.frais),
     acompte: Number(loc.acompte),
     caution: Number(loc.caution),
+    langue: (loc as any).langue ?? 'fr',
     createdAt: loc.createdAt.toISOString(),
     updatedAt: loc.updatedAt.toISOString(),
   };
@@ -32,5 +33,6 @@ export function fromLocationFormDTO(body: LocationFormDTO) {
     frais: parseFloat(body.frais) || 0,
     acompte: parseFloat(body.acompte) || 0,
     caution: parseFloat(body.caution) || 0,
+    langue: body.langue ?? 'fr',
   };
 }
