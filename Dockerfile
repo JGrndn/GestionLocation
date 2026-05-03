@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Désactive la télémtrie Nextjs
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Le build Next.js a besoin de DATABASE_URL pour valider les imports Prisma
 # On lui donne une valeur factice — la vraie sera injectée au runtime
@@ -33,7 +33,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 # Désactive la télémtrie Nextjs
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Copier uniquement le nécessaire
 COPY --from=builder /app/public ./public
