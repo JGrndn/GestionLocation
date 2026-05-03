@@ -78,7 +78,6 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
   })();
 
   async function handleSubmit() {
-    if (!form.dateArrivee || !form.depart) return;
     setLoading(true);
     setError(null);
     const err = await onSave(form as unknown as LocationInput);

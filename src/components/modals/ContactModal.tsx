@@ -33,7 +33,6 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function handleSubmit() {
-    if (!form.prenom && !form.nom) return;
     setLoading(true);
     setError(null);
     const err = await onSave(form);
