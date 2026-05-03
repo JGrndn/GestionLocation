@@ -1,16 +1,25 @@
 "use client";
 
-import { ContactDTO, ContactFormDTO } from "@/dto/contact.dto";
+import { ContactDTO } from "@/dto/contact.dto";
+import { ContactInput } from "@/lib/schema";
 import { useState } from "react";
+
+type ContactForm = {
+  prenom: string;
+  nom: string;
+  email: string;
+  telephone: string;
+  adresse: string;
+};
 
 type Props = {
   contact?: ContactDTO;
   onClose: () => void;
-  onSave: (data: ContactFormDTO) => Promise<void>;
+  onSave: (data: ContactInput) => Promise<string | null>;
 };
 
 export function ContactModal({ contact, onClose, onSave }: Props) {
-  const [form, setForm] = useState<ContactFormDTO>({
+  const [form, setForm] = useState<ContactForm>({
     prenom: contact?.prenom ?? "",
     nom: contact?.nom ?? "",
     email: contact?.email ?? "",
@@ -18,14 +27,16 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
     adresse: contact?.adresse ?? "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const set = (k: keyof ContactFormDTO) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof ContactForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function handleSubmit() {
-    if (!form.prenom && !form.nom) return;
     setLoading(true);
-    await onSave(form);
+    setError(null);
+    const err = await onSave(form);
+    if (err) setError(err);
     setLoading(false);
   }
 
@@ -37,6 +48,7 @@ export function ContactModal({ contact, onClose, onSave }: Props) {
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
+          {error && <div className="form-error">{error}</div>}
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Prénom</label>

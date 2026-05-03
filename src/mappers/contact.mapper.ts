@@ -1,6 +1,6 @@
 import type { Contact, Location } from '@/generated/prisma/client';
-import type { ContactDTO, ContactFormDTO } from '@/dto/contact.dto';
-import type { LocationDTO } from '@/dto/location.dto';
+import type { ContactDTO } from '@/dto/contact.dto';
+import type { ContactInput } from '@/lib/schema';
 import { toLocationDTO } from './location.mapper';
 
 type ContactWithLocations = Contact & { locations: Location[] };
@@ -19,7 +19,7 @@ export function toContactDTO(contact: ContactWithLocations): ContactDTO {
   };
 }
 
-export function fromContactFormDTO(body: ContactFormDTO) {
+export function fromContactInput(body: ContactInput) {
   return {
     prenom: body.prenom,
     nom: body.nom,

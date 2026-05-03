@@ -65,7 +65,7 @@ export async function GET(_req: Request, { params }: Params) {
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="location_${contact.nom}_${location.dateArrivee.toISOString().slice(0, 10)}_${lang}.pdf"`,
+      'Content-Disposition': `attachment; filename="location_${contact.nom}_${location.dateArrivee.toISOString().slice(0, 10)}_${lang}.pdf"`,
     },
   });
 }

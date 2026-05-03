@@ -2,16 +2,31 @@
 
 import { useState } from "react";
 import { calcLocation } from "@/lib/utils";
-import { LocationDTO, LocationFormDTO } from "@/dto/location.dto";
+import { LocationDTO } from "@/dto/location.dto";
+import { LocationInput } from "@/lib/schema";
+
+type LocationForm = {
+  dateArrivee: string;
+  depart: string;
+  adultes: string;
+  enfants: string;
+  animaux: string;
+  prixBase: string;
+  taxeParNuit: string;
+  frais: string;
+  acompte: string;
+  caution: string;
+  langue: string;
+};
 
 type Props = {
   location?: LocationDTO;
   contactName: string;
   onClose: () => void;
-  onSave: (data: LocationFormDTO) => Promise<void>;
+  onSave: (data: LocationInput) => Promise<string | null>;
 };
 
-const empty: LocationFormDTO = {
+const empty: LocationForm = {
   dateArrivee: "",
   depart: "",
   adultes: "1",
@@ -26,7 +41,7 @@ const empty: LocationFormDTO = {
 };
 
 export function LocationModal({ location, contactName, onClose, onSave }: Props) {
-  const [form, setForm] = useState<LocationFormDTO>(
+  const [form, setForm] = useState<LocationForm>(
     location
       ? {
           dateArrivee: location.dateArrivee.slice(0, 10),
@@ -44,8 +59,9 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
       : empty
   );
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const set = (k: keyof LocationFormDTO) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const set = (k: keyof LocationForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const computed = (() => {
@@ -62,9 +78,10 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
   })();
 
   async function handleSubmit() {
-    if (!form.dateArrivee || !form.depart) return;
     setLoading(true);
-    await onSave(form);
+    setError(null);
+    const err = await onSave(form as unknown as LocationInput);
+    if (err) setError(err);
     setLoading(false);
   }
 
@@ -78,6 +95,7 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
+          {error && <div className="form-error">{error}</div>}
           <div className="form-grid">
             <div className="section-label">Séjour</div>
             <div className="form-group">
