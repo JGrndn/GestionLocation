@@ -85,7 +85,7 @@ export default function Home() {
     <>
       <div className="app">
         <div className="topbar">
-          <div className="logo">Loc<span>Gérer</span></div>
+          <div className="logo">Gestion<span>Location</span> <span className="logo-version">v{process.env.NEXT_PUBLIC_APP_VERSION}</span></div>
           <div className="topbar-actions">
             <button className="btn primary" onClick={() => setContactModal({ open: true })}>
               + Nouveau contact
@@ -94,6 +94,7 @@ export default function Home() {
               Déconnexion
             </button>
           </div>
+          
         </div>
 
         <div className="grid">

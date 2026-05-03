@@ -29,7 +29,7 @@ body { font-family: system-ui, -apple-system, sans-serif; font-size: 14px; color
 
 .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; gap: 8px; flex-wrap: wrap; }
 .logo { font-size: 18px; font-weight: 500; }
-.logo span { color: var(--green); }
+.logo > span:first-of-type { color: var(--green); }
 .topbar-actions { display: flex; align-items: center; gap: 10px; }
 
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--surface); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); transition: background .15s; }
@@ -118,6 +118,8 @@ input.text-green { color: var(--green); }
   border-radius: var(--radius); 
   margin-bottom: 12px; 
 }
+
+.logo-version { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 
 /* Login */
 .login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
