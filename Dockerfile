@@ -32,6 +32,7 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_APP_ENV=production
 # Désactive la télémtrie Nextjs
 ENV NEXT_TELEMETRY_DISABLED=1
 

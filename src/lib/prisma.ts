@@ -11,9 +11,9 @@ export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.NEXT_PUBLIC_APP_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }

@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LocGérer",
+  title: "Gestion Location",
   description: "Gestion de locations",
 };
 

@@ -36,7 +36,7 @@ export default function LoginPage() {
     <div className="login-screen">
       <div className="login-box">
         <div className="login-logo">
-          Loc<span>Gérer</span>
+          Gestion<span>Location</span>
         </div>
         <div className="login-sub">Connectez-vous pour accéder à vos données</div>
 
