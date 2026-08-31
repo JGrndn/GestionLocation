@@ -11,6 +11,7 @@ type LocationForm = {
   adultes: string;
   enfants: string;
   animaux: string;
+  prixUnitaire: string;
   prixBase: string;
   taxeParNuit: string;
   frais: string;
@@ -32,6 +33,7 @@ const empty: LocationForm = {
   adultes: "1",
   enfants: "0",
   animaux: "0",
+  prixUnitaire: "",
   prixBase: "",
   taxeParNuit: "",
   frais: "",
@@ -43,19 +45,31 @@ const empty: LocationForm = {
 export function LocationModal({ location, contactName, onClose, onSave }: Props) {
   const [form, setForm] = useState<LocationForm>(
     location
-      ? {
-          dateArrivee: location.dateArrivee.slice(0, 10),
-          depart: location.depart.slice(0, 10),
-          adultes: String(location.adultes),
-          enfants: String(location.enfants),
-          animaux: String(location.animaux),
-          prixBase: String(location.prixBase),
-          taxeParNuit: String(location.taxeParNuit),
-          frais: String(location.frais),
-          acompte: String(location.acompte),
-          caution: String(location.caution),
-          langue: location.langue ?? "fr",
-        }
+      ? (() => {
+          const initN = calcLocation({
+            dateArrivee: location.dateArrivee.slice(0, 10),
+            depart:      location.depart.slice(0, 10),
+            adultes:     location.adultes,
+            prixBase:    location.prixBase,
+            taxeParNuit: location.taxeParNuit,
+            frais:       location.frais,
+            acompte:     location.acompte,
+          }).n;
+          return {
+            dateArrivee:  location.dateArrivee.slice(0, 10),
+            depart:       location.depart.slice(0, 10),
+            adultes:      String(location.adultes),
+            enfants:      String(location.enfants),
+            animaux:      String(location.animaux),
+            prixUnitaire: initN > 0 ? (location.prixBase / initN).toFixed(2) : "",
+            prixBase:     String(location.prixBase),
+            taxeParNuit:  String(location.taxeParNuit),
+            frais:        String(location.frais),
+            acompte:      String(location.acompte),
+            caution:      String(location.caution),
+            langue:       location.langue ?? "fr",
+          };
+        })()
       : empty
   );
   const [loading, setLoading] = useState(false);
@@ -76,6 +90,28 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
       acompte: parseFloat(form.acompte) || 0,
     });
   })();
+
+  function handlePrixUnitaireChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    const n = computed?.n ?? 0;
+    const unitaire = parseFloat(val);
+    setForm(f => ({
+      ...f,
+      prixUnitaire: val,
+      prixBase: (n > 0 && !isNaN(unitaire)) ? (unitaire * n).toFixed(2) : f.prixBase,
+    }));
+  }
+
+  function handlePrixBaseChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    const n = computed?.n ?? 0;
+    const base = parseFloat(val);
+    setForm(f => ({
+      ...f,
+      prixBase: val,
+      prixUnitaire: (n > 0 && !isNaN(base)) ? (base / n).toFixed(2) : "",
+    }));
+  }
 
   async function handleSubmit() {
     setLoading(true);
@@ -127,8 +163,12 @@ export function LocationModal({ location, contactName, onClose, onSave }: Props)
             <div className="section-label">Tarification</div>
 
             <div className="form-group">
+              <label className="form-label">Prix unitaire (€/nuit)</label>
+              <input type="number" min="0" step="0.01" value={form.prixUnitaire} onChange={handlePrixUnitaireChange} placeholder="0.00" />
+            </div>
+            <div className="form-group">
               <label className="form-label">Prix séjour HF (€)</label>
-              <input type="number" min="0" step="0.01" value={form.prixBase} onChange={set("prixBase")} placeholder="0.00" />
+              <input type="number" min="0" step="0.01" value={form.prixBase} onChange={handlePrixBaseChange} placeholder="0.00" />
             </div>
             <div className="form-group">
               <label className="form-label">Taxe / adulte / nuit (€)</label>
