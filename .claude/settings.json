@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls C:/dev/PRIVATE/GestionLocation/src/middleware.ts C:/dev/PRIVATE/GestionLocation/src/proxy.ts 2>&1)",
+      "Read(//c/dev/PRIVATE/GestionLocation/src/**)",
+      "Bash(ls C:/dev/PRIVATE/ 2>&1)",
+      "Read(//c/dev/PRIVATE/**)",
+      "Read(//c/dev/PRIVATE/afda/prisma/**)",
+      "Read(//c/dev/PRIVATE/afda/**)",
+      "Read(//c/dev/PRIVATE/GestionLocation/src/lib/**)",
+      "Read(//c/dev/PRIVATE/GestionLocation/prisma/**)",
+      "Read(//c/dev/PRIVATE/GestionLocation/**)",
+      "Read(//c/dev/PRIVATE/auth-service/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\dev\\PRIVATE\\auth-service",
+      "C:\\dev\\PRIVATE\\cmlm\\prisma",
+      "C:\\dev\\PRIVATE\\cmlm\\src\\lib",
+      "C:\\dev\\PRIVATE\\cmlm",
+      "C:\\dev\\PRIVATE\\afda\\prisma",
+      "C:\\dev\\PRIVATE\\afda\\src\\lib",
+      "C:\\dev\\PRIVATE\\afda",
+      "C:\\dev\\PRIVATE\\GestionLocation\\prisma",
+      "C:\\dev\\PRIVATE\\GestionLocation\\src\\lib",
+      "C:\\dev\\PRIVATE\\GestionLocation",
+      "C:\\dev\\PRIVATE\\cmlm\\src\\lib\\auth",
+      "C:\\dev\\PRIVATE\\afda\\src\\lib\\auth"
+    ]
+  }
+}

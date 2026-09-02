@@ -1,7 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { prisma } from "./prisma";
+import { prismaAuth } from "./prisma-auth";
+
+const APP_NAME = "gestion-location";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -13,10 +15,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
+        const user = await prismaAuth.user.findUnique({
           where: { email: String(credentials.email).toLowerCase() },
         });
-        if (!user) return null;
+        if (!user || !user.isActive || !user.password) return null;
 
         const valid = await bcrypt.compare(
           String(credentials.password),
@@ -24,20 +26,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!valid) return null;
 
-        return { id: user.id, email: user.email, name: user.name };
+        const perm = await prismaAuth.appPermission.findUnique({
+          where: { userId_app: { userId: user.id, app: APP_NAME } },
+        });
+        if (!perm) return null;
+
+        return { id: user.id, email: user.email, name: user.name, role: perm.role };
       },
     }),
-    // Pour ajouter Google plus tard :
-    // Google({ clientId: process.env.AUTH_GOOGLE_ID!, clientSecret: process.env.AUTH_GOOGLE_SECRET! }),
   ],
   session: { strategy: "jwt" },
+  // Définir NEXTAUTH_COOKIE_DOMAIN=.mondomaine.home pour activer le SSO cross-app
+  ...(process.env.NEXTAUTH_COOKIE_DOMAIN
+    ? {
+        cookies: {
+          sessionToken: {
+            options: {
+              domain: process.env.NEXTAUTH_COOKIE_DOMAIN,
+              path: "/",
+              sameSite: "lax" as const,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+            },
+          },
+        },
+      }
+    : {}),
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.role = (user as { role?: string }).role;
+      }
       return token;
     },
     async session({ session, token }) {
       if (token?.id) session.user.id = token.id as string;
+      if (token?.role) (session.user as { role?: string }).role = token.role as string;
       return session;
     },
   },

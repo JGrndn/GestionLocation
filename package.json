@@ -10,7 +10,7 @@
     "dev:install": "npm i && npm run prisma:generate",
     "dev": "cross-env NEXT_PUBLIC_APP_ENV=development next dev -H 0.0.0.0",
     "dev:test": "cross-env NEXT_PUBLIC_APP_ENV=test next dev -H 0.0.0.0",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "prisma generate && prisma generate --schema=prisma/auth.prisma",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:seed:admin":"tsx prisma/seed-admin.ts",
