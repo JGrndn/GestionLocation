@@ -62,6 +62,14 @@ export async function GET(_req: Request, { params }: Params) {
 
   const buffer = await renderToBuffer(element);
 
+  // Horodate le dernier téléchargement du PDF vierge (best-effort : ne bloque
+  // pas la réponse si l'écriture échoue, mais on log pour ne pas masquer un souci).
+  try {
+    await locationService.markPdfGenerated(location.id);
+  } catch (e) {
+    console.error('markPdfGenerated a échoué', e);
+  }
+
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'application/pdf',

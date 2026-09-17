@@ -44,6 +44,7 @@ model Location {
   caution     Decimal  @db.Decimal(10, 2) @default(0)
   langue      String   @default("fr")
   documents   ContractDocument[]
+  pdfGeneratedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -57,6 +58,7 @@ model ContractDocument {
   filename   String
   mimeType   String   @default("application/pdf")
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@unique([locationId, kind]) // au plus un de chaque par location
 }

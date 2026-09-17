@@ -19,6 +19,14 @@ export const locationService = {
     });
   },
 
+  /** Horodate le dernier téléchargement/génération du PDF vierge. */
+  async markPdfGenerated(locId: string) {
+    await prisma.location.update({
+      where: { id: locId },
+      data: { pdfGeneratedAt: new Date() },
+    });
+  },
+
   async create(contactId: string, body: LocationInput) {
     const location = await prisma.location.create({
       data: { contactId, ...fromLocationInput(body) },
