@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { calcLocation, fmtDate, money } from "@/lib/utils";
 import { LocationModal } from "./modals/LocationModal";
+import { ActionMenu } from "./ActionMenu";
 import { ContactDTO } from "@/dto/contact.dto";
 import { LocationDTO } from "@/dto/location.dto";
 import { LocationInput } from "@/lib/schema";
@@ -22,6 +23,9 @@ function initials(p: string, n: string) {
 export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
   const [locationModal, setLocationModal] = useState<{ open: boolean; location?: LocationDTO }>({ open: false });
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
+  const [docLoading, setDocLoading] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadTargetRef = useRef<string | null>(null);
 
   async function handleSaveLocation(data: LocationInput, locId?: string): Promise<string | null> {
     const url = locId
@@ -60,8 +64,60 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
     }
   }
 
+  function triggerUpload(locId: string) {
+    uploadTargetRef.current = locId;
+    fileInputRef.current?.click();
+  }
+
+  async function handleUploadSigned(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const locId = uploadTargetRef.current;
+    e.target.value = ""; // permet de re-sélectionner le même fichier ensuite
+    if (!file || !locId) return;
+    setDocLoading(locId);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents`, {
+        method: "POST",
+        body: fd,
+      });
+      const result = await handleResponse(res);
+      if (!result.ok) {
+        alert(result.message);
+        return;
+      }
+      onRefresh();
+    } finally {
+      setDocLoading(null);
+      uploadTargetRef.current = null;
+    }
+  }
+
+  async function handleDownloadDoc(locId: string, kind: "tenant-signed" | "countersigned") {
+    const res = await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents/${kind}`);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  async function handleDeleteDocs(locId: string) {
+    if (!confirm("Supprimer les PDF signés de cette location ?")) return;
+    await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents`, { method: "DELETE" });
+    onRefresh();
+  }
+
   return (
     <div className="detail-panel">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        style={{ display: "none" }}
+        onChange={handleUploadSigned}
+      />
       <div className="contact-card">
         <div className="contact-card-header">
           <div className="avatar-lg">{initials(contact.prenom, contact.nom)}</div>
@@ -108,28 +164,13 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span className="badge">{money(prixTotal)}</span>
-                    <button
-                      className="btn sm pdf"
-                      onClick={() => handleDownloadPDF(loc, "fr")}
-                      disabled={pdfLoading === loc.id + "_fr"}
-                    >
-                      {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
-                    </button>
-                    {loc.langue === "en" && (
-                      <button
-                        className="btn sm pdf"
-                        onClick={() => handleDownloadPDF(loc, "en")}
-                        disabled={pdfLoading === loc.id + "_en"}
-                      >
-                        {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
-                      </button>
-                    )}
-                    <button className="btn sm" onClick={() => setLocationModal({ open: true, location: loc })}>
-                      Modifier
-                    </button>
-                    <button className="btn sm danger" onClick={() => handleDeleteLocation(loc.id)}>
-                      ×
-                    </button>
+                    <ActionMenu
+                      ariaLabel="Actions de la location"
+                      items={[
+                        { label: "Modifier", onClick: () => setLocationModal({ open: true, location: loc }) },
+                        { label: "Supprimer la location", danger: true, onClick: () => handleDeleteLocation(loc.id) },
+                      ]}
+                    />
                   </div>
                 </div>
 
@@ -169,6 +210,65 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                     <div className="label">Solde à payer</div>
                     <div className="value total">{money(solde)}</div>
                   </div>
+                </div>
+
+                <div className="contract-block">
+                  <div className="contract-label">Contrat</div>
+                  {!loc.hasTenantSigned && (
+                    <div className="contract-row">
+                      <button
+                        className="btn sm pdf"
+                        onClick={() => handleDownloadPDF(loc, "fr")}
+                        disabled={pdfLoading === loc.id + "_fr"}
+                      >
+                        {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
+                      </button>
+                      {loc.langue === "en" && (
+                        <button
+                          className="btn sm pdf"
+                          onClick={() => handleDownloadPDF(loc, "en")}
+                          disabled={pdfLoading === loc.id + "_en"}
+                        >
+                          {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <div className="contract-row">
+                    {!loc.hasTenantSigned ? (
+                      <button
+                        className="btn sm"
+                        onClick={() => triggerUpload(loc.id)}
+                        disabled={docLoading === loc.id}
+                      >
+                        {docLoading === loc.id ? "Traitement..." : "⬆️ Uploader le contrat signé"}
+                      </button>
+                    ) : (
+                      <>
+                        {loc.hasCountersigned && (
+                          <button className="btn sm pdf" onClick={() => handleDownloadDoc(loc.id, "countersigned")}>
+                            📄 Contrat signé
+                          </button>
+                        )}
+                        <button className="btn sm" onClick={() => handleDownloadDoc(loc.id, "tenant-signed")}>
+                          Signé locataire
+                        </button>
+                        <button
+                          className="btn sm danger"
+                          title="Supprimer les PDF signés"
+                          onClick={() => handleDeleteDocs(loc.id)}
+                        >
+                          🗑 Supprimer PDF
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {loc.hasTenantSigned && !loc.hasCountersigned && (
+                    <div className="contract-note">
+                      Contre-signature manquante. Ajoutez votre signature dans « ⚙️ Réglages »,
+                      puis supprimez et ré-uploadez le contrat signé.
+                    </div>
+                  )}
                 </div>
               </div>
             );

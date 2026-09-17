@@ -13,7 +13,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
-    "prisma:seed:admin":"tsx prisma/seed-admin.ts",
+    "prisma:seed:admin": "tsx prisma/seed-admin.ts",
     "prisma:studio": "prisma studio",
     "build": "next build"
   },
@@ -30,6 +30,7 @@
     "lucide-react": "^0.556.0",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.16.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

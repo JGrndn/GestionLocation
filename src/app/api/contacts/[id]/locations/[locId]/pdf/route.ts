@@ -62,6 +62,15 @@ export async function GET(_req: Request, { params }: Params) {
 
   const buffer = await renderToBuffer(element);
 
+  // Horodate le dernier téléchargement du PDF vierge, en « fire-and-forget » :
+  // on n'attend PAS l'écriture, pour qu'un souci de connexion à la base (requête
+  // qui pend, pas seulement qui échoue) ne puisse jamais bloquer ni casser le
+  // téléchargement. Le serveur est un process Node long-vivant, donc la promesse
+  // s'exécute jusqu'au bout même sans await. Les erreurs sont loguées.
+  locationService
+    .markPdfGenerated(location.id)
+    .catch((e) => console.error('markPdfGenerated a échoué', e));
+
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'application/pdf',

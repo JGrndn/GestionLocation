@@ -7,6 +7,7 @@ export const locationService = {
     const locations = await prisma.location.findMany({
       where: { contactId },
       orderBy: { dateArrivee: 'desc' },
+      include: { documents: { select: { kind: true } } },
     });
     return locations.map(toLocationDTO);
   },
@@ -15,6 +16,14 @@ export const locationService = {
     return prisma.location.findUnique({
       where: { id: locId },
       include: { contact: true },
+    });
+  },
+
+  /** Horodate le dernier téléchargement/génération du PDF vierge. */
+  async markPdfGenerated(locId: string) {
+    await prisma.location.update({
+      where: { id: locId },
+      data: { pdfGeneratedAt: new Date() },
     });
   },
 

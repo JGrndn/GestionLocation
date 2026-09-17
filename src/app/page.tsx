@@ -8,6 +8,7 @@ import type { ContactInput } from "@/lib/schema";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
+import { SettingsModal } from "@/components/modals/SettingsModal";
 
 export default function Home() {
   const { fetchAll, fetchOne, create, update, remove } = useContacts();
@@ -16,6 +17,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [contactModal, setContactModal] = useState<{ open: boolean; contact?: ContactDTO }>({ open: false });
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"list" | "detail">("list");
 
   useEffect(() => {
@@ -90,6 +92,9 @@ export default function Home() {
             <button className="btn primary" onClick={() => setContactModal({ open: true })}>
               + Nouveau contact
             </button>
+            <button className="btn" onClick={() => setSettingsOpen(true)}>
+              ⚙️ Réglages
+            </button>
             <button className="logout-btn" onClick={() => signOut({ callbackUrl: "/login" })}>
               Déconnexion
             </button>
@@ -153,6 +158,8 @@ export default function Home() {
           onSave={handleSaveContact}
         />
       )}
+
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </>
   );
 }
