@@ -1,7 +1,7 @@
 import type { Contact, Location } from '@/generated/prisma/client';
 import type { ContactDTO } from '@/dto/contact.dto';
 import type { ContactInput } from '@/lib/schema';
-import { toLocationDTO } from './location.mapper';
+import { toLocationDTO } from '@/modules/location';
 
 type ContactWithLocations = Contact & { locations: Location[] };
 

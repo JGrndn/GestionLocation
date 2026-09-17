@@ -1,4 +1,4 @@
-import { LocationDTO } from "./location.dto";
+import { LocationDTO } from "@/modules/location";
 
 export type ContactDTO = {
   id: string;

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { locationService } from '@/services/location.service';
-import { LocationSchema } from '@/lib/schema';
+import { locationService, LocationSchema } from '@/modules/location';
 
 type Params = { params: Promise<{ id: string; locId: string }> };
 

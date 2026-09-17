@@ -1,6 +1,6 @@
 import type { Location } from '@/generated/prisma/client';
-import type { LocationDTO } from '@/dto/location.dto';
-import type { LocationInput } from '@/lib/schema';
+import type { LocationDTO } from './location.dto';
+import type { LocationInput } from './location.schema';
 
 // `documents` n'est présent que lorsqu'il est inclus dans la requête Prisma.
 type LocationWithDocs = Location & { documents?: { kind: string }[] };

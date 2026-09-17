@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { calcLocation } from "@/lib/utils";
-import { LocationDTO } from "@/dto/location.dto";
-import { LocationInput } from "@/lib/schema";
+import { calcLocation } from "../location.calc";
+import { LocationDTO } from "../location.dto";
+import { LocationInput } from "../location.schema";
 
 type LocationForm = {
   dateArrivee: string;

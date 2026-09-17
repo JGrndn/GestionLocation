@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { calcLocation } from "@/lib/utils";
+import { calcLocation, LocationModal } from "@/modules/location/ui";
 import { fmtDate, money } from "@/lib/format";
-import { LocationModal } from "./modals/LocationModal";
 import { ActionMenu } from "./ActionMenu";
 import { ContactDTO } from "@/dto/contact.dto";
-import { LocationDTO } from "@/dto/location.dto";
-import { LocationInput } from "@/lib/schema";
+import type { LocationDTO, LocationInput } from "@/modules/location/ui";
 import { handleResponse } from "@/lib/http";
 
 type Props = {
