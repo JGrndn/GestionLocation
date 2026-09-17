@@ -43,6 +43,27 @@ model Location {
   acompte     Decimal  @db.Decimal(10, 2) @default(0)
   caution     Decimal  @db.Decimal(10, 2) @default(0)
   langue      String   @default("fr")
+  documents   ContractDocument[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ContractDocument {
+  id         String   @id @default(cuid())
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  kind       String // "TENANT_SIGNED" | "COUNTERSIGNED"
+  content    Bytes // octets du PDF
+  filename   String
+  mimeType   String   @default("application/pdf")
+  createdAt  DateTime @default(now())
+
+  @@unique([locationId, kind]) // au plus un de chaque par location
+}
+
+model OwnerSignature {
+  id        String   @id @default("owner") // singleton, upsert sur cet id
+  content   Bytes // octets du PNG
+  mimeType  String   @default("image/png")
+  updatedAt DateTime @updatedAt
 }

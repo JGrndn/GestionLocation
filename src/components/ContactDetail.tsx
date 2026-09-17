@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { calcLocation, fmtDate, money } from "@/lib/utils";
 import { LocationModal } from "./modals/LocationModal";
 import { ContactDTO } from "@/dto/contact.dto";
@@ -22,6 +22,9 @@ function initials(p: string, n: string) {
 export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
   const [locationModal, setLocationModal] = useState<{ open: boolean; location?: LocationDTO }>({ open: false });
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
+  const [docLoading, setDocLoading] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadTargetRef = useRef<string | null>(null);
 
   async function handleSaveLocation(data: LocationInput, locId?: string): Promise<string | null> {
     const url = locId
@@ -60,8 +63,60 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
     }
   }
 
+  function triggerUpload(locId: string) {
+    uploadTargetRef.current = locId;
+    fileInputRef.current?.click();
+  }
+
+  async function handleUploadSigned(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const locId = uploadTargetRef.current;
+    e.target.value = ""; // permet de re-sélectionner le même fichier ensuite
+    if (!file || !locId) return;
+    setDocLoading(locId);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents`, {
+        method: "POST",
+        body: fd,
+      });
+      const result = await handleResponse(res);
+      if (!result.ok) {
+        alert(result.message);
+        return;
+      }
+      onRefresh();
+    } finally {
+      setDocLoading(null);
+      uploadTargetRef.current = null;
+    }
+  }
+
+  async function handleDownloadDoc(locId: string, kind: "tenant-signed" | "countersigned") {
+    const res = await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents/${kind}`);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  async function handleDeleteDocs(locId: string) {
+    if (!confirm("Supprimer les PDF signés de cette location ?")) return;
+    await fetch(`/api/contacts/${contact.id}/locations/${locId}/documents`, { method: "DELETE" });
+    onRefresh();
+  }
+
   return (
     <div className="detail-panel">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        style={{ display: "none" }}
+        onChange={handleUploadSigned}
+      />
       <div className="contact-card">
         <div className="contact-card-header">
           <div className="avatar-lg">{initials(contact.prenom, contact.nom)}</div>
@@ -122,6 +177,34 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                         disabled={pdfLoading === loc.id + "_en"}
                       >
                         {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
+                      </button>
+                    )}
+                    {!loc.hasTenantSigned && (
+                      <button
+                        className="btn sm"
+                        onClick={() => triggerUpload(loc.id)}
+                        disabled={docLoading === loc.id}
+                      >
+                        {docLoading === loc.id ? "Traitement..." : "⬆️ Uploader signé"}
+                      </button>
+                    )}
+                    {loc.hasCountersigned && (
+                      <button className="btn sm pdf" onClick={() => handleDownloadDoc(loc.id, "countersigned")}>
+                        📄 Contre-signé
+                      </button>
+                    )}
+                    {loc.hasTenantSigned && (
+                      <button className="btn sm" onClick={() => handleDownloadDoc(loc.id, "tenant-signed")}>
+                        Signé locataire
+                      </button>
+                    )}
+                    {(loc.hasTenantSigned || loc.hasCountersigned) && (
+                      <button
+                        className="btn sm danger"
+                        title="Supprimer les PDF signés"
+                        onClick={() => handleDeleteDocs(loc.id)}
+                      >
+                        🗑
                       </button>
                     )}
                     <button className="btn sm" onClick={() => setLocationModal({ open: true, location: loc })}>

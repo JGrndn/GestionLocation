@@ -2,11 +2,18 @@ import { prisma } from '@/lib/prisma';
 import { fromContactInput, toContactDTO } from '@/mappers/contact.mapper';
 import type { ContactInput } from '@/lib/schema';
 
+// Charge les locations d'un contact avec, pour chacune, le type des documents
+// présents (sans les octets) afin d'exposer l'état signé/contre-signé à l'UI.
+const locationsWithDocs = {
+  orderBy: { dateArrivee: 'desc' as const },
+  include: { documents: { select: { kind: true } } },
+};
+
 export const contactService = {
   async findAll() {
     const contacts = await prisma.contact.findMany({
       orderBy: { nom: 'asc' },
-      include: { locations: { orderBy: { dateArrivee: 'desc' } } },
+      include: { locations: locationsWithDocs },
     });
     return contacts.map(toContactDTO);
   },
@@ -21,7 +28,7 @@ export const contactService = {
   async findById(id: string) {
     const contact = await prisma.contact.findUnique({
       where: { id },
-      include: { locations: { orderBy: { dateArrivee: 'desc' } } },
+      include: { locations: locationsWithDocs },
     });
     return contact ? toContactDTO(contact) : null;
   },
@@ -38,7 +45,7 @@ export const contactService = {
     const contact = await prisma.contact.update({
       where: { id },
       data: fromContactInput(body),
-      include: { locations: { orderBy: { dateArrivee: 'desc' } } },
+      include: { locations: locationsWithDocs },
     });
     return toContactDTO(contact);
   },

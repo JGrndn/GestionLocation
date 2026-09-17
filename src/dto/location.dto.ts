@@ -12,6 +12,8 @@ export type LocationDTO = {
   acompte: number;
   caution: number;
   langue: string; // "fr" | "en"
+  hasTenantSigned?: boolean;
+  hasCountersigned?: boolean;
   createdAt: string;
   updatedAt: string;
 };

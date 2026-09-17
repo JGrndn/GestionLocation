@@ -7,6 +7,7 @@ export const locationService = {
     const locations = await prisma.location.findMany({
       where: { contactId },
       orderBy: { dateArrivee: 'desc' },
+      include: { documents: { select: { kind: true } } },
     });
     return locations.map(toLocationDTO);
   },

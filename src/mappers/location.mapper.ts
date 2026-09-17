@@ -2,7 +2,11 @@ import type { Location } from '@/generated/prisma/client';
 import type { LocationDTO } from '@/dto/location.dto';
 import type { LocationInput } from '@/lib/schema';
 
-export function toLocationDTO(loc: Location): LocationDTO {
+// `documents` n'est présent que lorsqu'il est inclus dans la requête Prisma.
+type LocationWithDocs = Location & { documents?: { kind: string }[] };
+
+export function toLocationDTO(loc: LocationWithDocs): LocationDTO {
+  const kinds = loc.documents?.map((d) => d.kind) ?? [];
   return {
     id: loc.id,
     contactId: loc.contactId,
@@ -17,6 +21,8 @@ export function toLocationDTO(loc: Location): LocationDTO {
     acompte: Number(loc.acompte),
     caution: Number(loc.caution),
     langue: (loc as any).langue ?? 'fr',
+    hasTenantSigned: kinds.includes('TENANT_SIGNED'),
+    hasCountersigned: kinds.includes('COUNTERSIGNED'),
     createdAt: loc.createdAt.toISOString(),
     updatedAt: loc.updatedAt.toISOString(),
   };
