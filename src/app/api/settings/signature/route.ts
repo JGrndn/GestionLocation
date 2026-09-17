@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { documentService } from '@/services/document.service';
+import { documentService } from '@/modules/contract';
 
 export const runtime = 'nodejs';
 

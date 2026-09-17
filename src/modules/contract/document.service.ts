@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { countersignPdf } from '@/lib/countersign';
+import { countersignPdf } from './countersign';
 
 export type DocumentKind = 'TENANT_SIGNED' | 'COUNTERSIGNED';
 

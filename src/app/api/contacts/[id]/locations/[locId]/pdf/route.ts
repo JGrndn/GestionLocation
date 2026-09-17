@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { locationService } from '@/services/location.service';
 import { renderToBuffer } from '@react-pdf/renderer';
-import { LocationDocument } from '@/components/pdf/LocationDocument';
-import { LocationDocumentEN } from '@/components/pdf/LocationDocumentEN';
+import { LocationDocument } from '@/modules/contract/pdf/LocationDocument';
+import { LocationDocumentEN } from '@/modules/contract/pdf/LocationDocumentEN';
 import React from 'react';
 
 type Params = { params: Promise<{ locId: string }> };

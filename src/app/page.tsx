@@ -8,7 +8,7 @@ import type { ContactInput } from "@/lib/schema";
 import { ContactList } from "@/components/ContactList";
 import { ContactDetail } from "@/components/ContactDetail";
 import { ContactModal } from "@/components/modals/ContactModal";
-import { SettingsModal } from "@/components/modals/SettingsModal";
+import { SettingsModal } from "@/modules/contract/ui";
 
 export default function Home() {
   const { fetchAll, fetchOne, create, update, remove } = useContacts();
