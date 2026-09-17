@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { contactService } from '@/services/contact.service';
-import { ContactSchema } from '@/lib/schema';
+import { contactService } from '@/modules/contact';
+import { ContactSchema } from '@/modules/contact';
 
 type Params = { params: Promise<{ id: string }> };
 

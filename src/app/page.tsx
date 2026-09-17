@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { signOut } from "next-auth/react";
-import { useContacts } from "@/hooks/contact.hook";
-import type { ContactDTO } from "@/dto/contact.dto";
-import type { ContactInput } from "@/lib/schema";
-import { ContactList } from "@/components/ContactList";
-import { ContactDetail } from "@/components/ContactDetail";
-import { ContactModal } from "@/components/modals/ContactModal";
+import {
+  useContacts,
+  ContactList,
+  ContactDetail,
+  ContactModal,
+  type ContactDTO,
+  type ContactInput,
+} from "@/modules/contact/ui";
 import { SettingsModal } from "@/modules/contract/ui";
 
 export default function Home() {

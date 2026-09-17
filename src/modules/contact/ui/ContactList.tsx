@@ -1,6 +1,6 @@
 "use client";
 
-import { ContactDTO } from "@/dto/contact.dto";
+import type { ContactDTO } from "../contact.dto";
 
 
 type Props = {

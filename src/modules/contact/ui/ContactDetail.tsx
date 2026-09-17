@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import { calcLocation, LocationModal } from "@/modules/location/ui";
 import { fmtDate, money } from "@/lib/format";
-import { ActionMenu } from "./ActionMenu";
-import { ContactDTO } from "@/dto/contact.dto";
+import { ActionMenu } from "@/components/ActionMenu";
+import type { ContactDTO } from "../contact.dto";
 import type { LocationDTO, LocationInput } from "@/modules/location/ui";
 import { handleResponse } from "@/lib/http";
 

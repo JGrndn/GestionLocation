@@ -1,5 +1,5 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import type { ContactDTO } from "@/dto/contact.dto";
+import type { ContactDTO } from "@/modules/contact";
 import type { LocationDTO } from "@/modules/location";
 
 const GREEN = "#1D9E75";
