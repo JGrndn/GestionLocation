@@ -1,7 +1,7 @@
 "use client";
 
-import { ContactDTO } from "@/dto/contact.dto";
-import { ContactInput } from "@/lib/schema";
+import type { ContactDTO } from "../contact.dto";
+import type { ContactInput } from "../contact.schema";
 import { useState } from "react";
 
 type ContactForm = {

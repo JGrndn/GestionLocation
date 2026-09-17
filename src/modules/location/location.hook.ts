@@ -1,7 +1,7 @@
 'use client';
-import type { LocationDTO } from '@/dto/location.dto';
-import type { LocationInput } from '@/lib/schema';
-import { handleResponse, type ApiResult } from './contact.hook';
+import type { LocationDTO } from './location.dto';
+import type { LocationInput } from './location.schema';
+import { handleResponse, type ApiResult } from '@/lib/http';
 
 export function useLocations(contactId: string) {
   async function create(data: LocationInput): Promise<ApiResult<LocationDTO>> {

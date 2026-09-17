@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { fromContactInput, toContactDTO } from '@/mappers/contact.mapper';
-import type { ContactInput } from '@/lib/schema';
+import { fromContactInput, toContactDTO } from './contact.mapper';
+import type { ContactInput } from './contact.schema';
 
 // Charge les locations d'un contact avec, pour chacune, le type des documents
 // présents (sans les octets) afin d'exposer l'état signé/contre-signé à l'UI.

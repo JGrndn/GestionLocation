@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { contactService } from '@/services/contact.service';
-import { ContactInput, ContactSchema } from '@/lib/schema';
+import { contactService } from '@/modules/contact';
+import { ContactInput, ContactSchema } from '@/modules/contact';
 
 export async function GET() {
   if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

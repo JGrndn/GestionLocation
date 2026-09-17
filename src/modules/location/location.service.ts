@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { fromLocationInput, toLocationDTO } from '@/mappers/location.mapper';
-import type { LocationInput } from '@/lib/schema';
+import { fromLocationInput, toLocationDTO } from './location.mapper';
+import type { LocationInput } from './location.schema';
 
 export const locationService = {
   async findAllForContact(contactId: string) {

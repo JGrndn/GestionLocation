@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { documentService } from '@/services/document.service';
+import { documentService } from '@/modules/contract';
 
 // pdf-lib manipule le PDF côté serveur : runtime Node requis.
 export const runtime = 'nodejs';

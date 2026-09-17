@@ -16,11 +16,3 @@ export function calcLocation(loc: {
   const solde = prixTotal - Number(loc.acompte);
   return { n, taxeTotale, frais, prixTotal, solde };
 }
-
-export function fmtDate(d: string | Date) {
-  return new Date(d).toLocaleDateString('fr-FR');
-}
-
-export function money(v: number) {
-  return v.toFixed(2) + ' €';
-}
