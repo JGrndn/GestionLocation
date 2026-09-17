@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { calcLocation, fmtDate, money } from "@/lib/utils";
 import { LocationModal } from "./modals/LocationModal";
+import { ActionMenu } from "./ActionMenu";
 import { ContactDTO } from "@/dto/contact.dto";
 import { LocationDTO } from "@/dto/location.dto";
 import { LocationInput } from "@/lib/schema";
@@ -163,56 +164,13 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                     <span className="badge">{money(prixTotal)}</span>
-                    <button
-                      className="btn sm pdf"
-                      onClick={() => handleDownloadPDF(loc, "fr")}
-                      disabled={pdfLoading === loc.id + "_fr"}
-                    >
-                      {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
-                    </button>
-                    {loc.langue === "en" && (
-                      <button
-                        className="btn sm pdf"
-                        onClick={() => handleDownloadPDF(loc, "en")}
-                        disabled={pdfLoading === loc.id + "_en"}
-                      >
-                        {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
-                      </button>
-                    )}
-                    {!loc.hasTenantSigned && (
-                      <button
-                        className="btn sm"
-                        onClick={() => triggerUpload(loc.id)}
-                        disabled={docLoading === loc.id}
-                      >
-                        {docLoading === loc.id ? "Traitement..." : "⬆️ Uploader signé"}
-                      </button>
-                    )}
-                    {loc.hasCountersigned && (
-                      <button className="btn sm pdf" onClick={() => handleDownloadDoc(loc.id, "countersigned")}>
-                        📄 Contre-signé
-                      </button>
-                    )}
-                    {loc.hasTenantSigned && (
-                      <button className="btn sm" onClick={() => handleDownloadDoc(loc.id, "tenant-signed")}>
-                        Signé locataire
-                      </button>
-                    )}
-                    {(loc.hasTenantSigned || loc.hasCountersigned) && (
-                      <button
-                        className="btn sm danger"
-                        title="Supprimer les PDF signés"
-                        onClick={() => handleDeleteDocs(loc.id)}
-                      >
-                        🗑
-                      </button>
-                    )}
-                    <button className="btn sm" onClick={() => setLocationModal({ open: true, location: loc })}>
-                      Modifier
-                    </button>
-                    <button className="btn sm danger" onClick={() => handleDeleteLocation(loc.id)}>
-                      ×
-                    </button>
+                    <ActionMenu
+                      ariaLabel="Actions de la location"
+                      items={[
+                        { label: "Modifier", onClick: () => setLocationModal({ open: true, location: loc }) },
+                        { label: "Supprimer la location", danger: true, onClick: () => handleDeleteLocation(loc.id) },
+                      ]}
+                    />
                   </div>
                 </div>
 
@@ -252,6 +210,65 @@ export function ContactDetail({ contact, onEdit, onDelete, onRefresh }: Props) {
                     <div className="label">Solde à payer</div>
                     <div className="value total">{money(solde)}</div>
                   </div>
+                </div>
+
+                <div className="contract-block">
+                  <div className="contract-label">Contrat</div>
+                  {!loc.hasTenantSigned && (
+                    <div className="contract-row">
+                      <button
+                        className="btn sm pdf"
+                        onClick={() => handleDownloadPDF(loc, "fr")}
+                        disabled={pdfLoading === loc.id + "_fr"}
+                      >
+                        {pdfLoading === loc.id + "_fr" ? "Génération..." : "📄 PDF FR"}
+                      </button>
+                      {loc.langue === "en" && (
+                        <button
+                          className="btn sm pdf"
+                          onClick={() => handleDownloadPDF(loc, "en")}
+                          disabled={pdfLoading === loc.id + "_en"}
+                        >
+                          {pdfLoading === loc.id + "_en" ? "Génération..." : "📄 PDF EN"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <div className="contract-row">
+                    {!loc.hasTenantSigned ? (
+                      <button
+                        className="btn sm"
+                        onClick={() => triggerUpload(loc.id)}
+                        disabled={docLoading === loc.id}
+                      >
+                        {docLoading === loc.id ? "Traitement..." : "⬆️ Uploader le contrat signé"}
+                      </button>
+                    ) : (
+                      <>
+                        {loc.hasCountersigned && (
+                          <button className="btn sm pdf" onClick={() => handleDownloadDoc(loc.id, "countersigned")}>
+                            📄 Contrat signé
+                          </button>
+                        )}
+                        <button className="btn sm" onClick={() => handleDownloadDoc(loc.id, "tenant-signed")}>
+                          Signé locataire
+                        </button>
+                        <button
+                          className="btn sm danger"
+                          title="Supprimer les PDF signés"
+                          onClick={() => handleDeleteDocs(loc.id)}
+                        >
+                          🗑 Supprimer PDF
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {loc.hasTenantSigned && !loc.hasCountersigned && (
+                    <div className="contract-note">
+                      Contre-signature manquante. Ajoutez votre signature dans « ⚙️ Réglages »,
+                      puis supprimez et ré-uploadez le contrat signé.
+                    </div>
+                  )}
                 </div>
               </div>
             );
