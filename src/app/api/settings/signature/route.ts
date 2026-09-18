@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { documentService } from '@/modules/contract';
 
+// Gère la signature du PROPRIÉTAIRE (POST = enregistrer le PNG, GET = le servir).
+// Le segment d'URL `/api/settings/` est historique et volontairement conservé :
+// il est consommé en dur par SettingsModal (module contract/ui). Le domaine réel
+// est la contre-signature de contrats — d'où documentService.{save,get}OwnerSignature.
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
