@@ -11,3 +11,11 @@ export type ContactDTO = {
   createdAt: string;
   updatedAt: string;
 };
+
+// Vue allégée servie par la liste des contacts (GET /api/contacts) : seuls les
+// champs réellement affichés, sans les locations imbriquées. Contrat honnête
+// pour findAllLight, distinct du ContactDTO complet.
+export type ContactSummary = Pick<
+  ContactDTO,
+  'id' | 'prenom' | 'nom' | 'email' | 'telephone'
+>;

@@ -8,13 +8,14 @@ import {
   ContactDetail,
   ContactModal,
   type ContactDTO,
+  type ContactSummary,
   type ContactInput,
 } from "@/modules/contact/ui";
 import { SettingsModal } from "@/modules/contract/ui";
 
 export default function Home() {
   const { fetchAll, fetchOne, create, update, remove } = useContacts();
-  const [contacts, setContacts] = useState<ContactDTO[]>([]);
+  const [contacts, setContacts] = useState<ContactSummary[]>([]);
   const [selected, setSelected] = useState<ContactDTO | null>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
