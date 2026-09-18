@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { ContactDTO } from "@/modules/contact";
-import type { LocationDTO } from "@/modules/location";
+import { calcLocation, type LocationDTO } from "@/modules/location";
 
 const GREEN = "#1D9E75";
 const DARK = "#1a1a1a";
@@ -53,12 +53,6 @@ function fmt(d: string | Date) {
   return new Date(d).toLocaleDateString("fr-FR");
 }
 
-function nuits(a: string | Date, b: string | Date) {
-  const da = new Date(a);
-  const db = new Date(b);
-  return Math.max(0, Math.round((db.getTime() - da.getTime()) / 86400000));
-}
-
 type Props = { contact: ContactDTO; location: LocationDTO };
 
 function Field({ label, value }: { label: string; value: string }) {
@@ -75,15 +69,11 @@ function Divider() {
 }
 
 export function LocationDocument({ contact, location }: Props) {
-  const n = nuits(location.dateArrivee, location.depart);
-  const prixBase = parseFloat(String(location.prixBase)) || 0;
-  const taxeParNuit = parseFloat(String(location.taxeParNuit)) || 0;
-  const frais = parseFloat(String(location.frais)) || 0;
-  const acompte = parseFloat(String(location.acompte)) || 0;
-  const caution = parseFloat(String(location.caution)) || 0;
-  const taxeTotale = taxeParNuit * location.adultes * n;
-  const prixTotal = prixBase + frais + taxeTotale;
-  const solde = prixTotal - acompte;
+  const { n, taxeTotale, frais, prixTotal, solde } = calcLocation(location);
+  const prixBase = Number(location.prixBase);
+  const taxeParNuit = Number(location.taxeParNuit);
+  const acompte = Number(location.acompte);
+  const caution = Number(location.caution);
   const today = new Date().toLocaleDateString("fr-FR");
   const m = (v: number) => v.toFixed(2);
 
