@@ -1,10 +1,10 @@
 "use client";
 
-import type { ContactDTO } from "../contact.dto";
+import type { ContactSummary } from "../contact.dto";
 
 
 type Props = {
-  contacts: ContactDTO[];
+  contacts: ContactSummary[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 };

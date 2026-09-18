@@ -1,10 +1,10 @@
 'use client';
-import type { ContactDTO } from './contact.dto';
+import type { ContactDTO, ContactSummary } from './contact.dto';
 import type { ContactInput } from './contact.schema';
 import { handleResponse, type ApiResult } from '@/lib/http';
 
 export function useContacts() {
-  async function fetchAll(): Promise<ContactDTO[]> {
+  async function fetchAll(): Promise<ContactSummary[]> {
     const res = await fetch('/api/contacts');
     return res.json();
   }

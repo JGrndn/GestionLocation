@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { fromContactInput, toContactDTO } from './contact.mapper';
 import type { ContactInput } from './contact.schema';
+import type { ContactSummary } from './contact.dto';
 
 // Charge les locations d'un contact avec, pour chacune, le type des documents
 // présents (sans les octets) afin d'exposer l'état signé/contre-signé à l'UI.
@@ -18,11 +19,11 @@ export const contactService = {
     return contacts.map(toContactDTO);
   },
 
-  async findAllLight() {
-    const contacts = await prisma.contact.findMany({
+  async findAllLight(): Promise<ContactSummary[]> {
+    return prisma.contact.findMany({
       orderBy: { nom: 'asc' },
+      select: { id: true, prenom: true, nom: true, email: true, telephone: true },
     });
-    return contacts;
   },
 
   async findById(id: string) {

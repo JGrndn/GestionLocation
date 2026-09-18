@@ -20,7 +20,7 @@ export function toLocationDTO(loc: LocationWithDocs): LocationDTO {
     frais: Number(loc.frais),
     acompte: Number(loc.acompte),
     caution: Number(loc.caution),
-    langue: (loc as any).langue ?? 'fr',
+    langue: loc.langue ?? 'fr',
     hasTenantSigned: kinds.includes('TENANT_SIGNED'),
     hasCountersigned: kinds.includes('COUNTERSIGNED'),
     createdAt: loc.createdAt.toISOString(),

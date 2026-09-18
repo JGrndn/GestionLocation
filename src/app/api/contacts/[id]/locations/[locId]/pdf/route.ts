@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { locationService } from '@/modules/location';
+import { locationService, toLocationDTO } from '@/modules/location';
+import { toContactDTO } from '@/modules/contact';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { LocationDocument } from '@/modules/contract/pdf/LocationDocument';
 import { LocationDocumentEN } from '@/modules/contract/pdf/LocationDocumentEN';
@@ -21,37 +22,13 @@ export async function GET(_req: Request, { params }: Params) {
   const { contact } = location;
 
   // lang query param takes priority, falls back to stored langue field
-  const lang = new URL(_req.url).searchParams.get('lang') ?? (location as any).langue ?? 'fr';
+  const lang = new URL(_req.url).searchParams.get('lang') ?? location.langue ?? 'fr';
 
-  const contactData = {
-    id: contact.id,
-    prenom: contact.prenom,
-    nom: contact.nom,
-    email: contact.email,
-    telephone: contact.telephone,
-    adresse: contact.adresse,
-    locations: [],
-    createdAt: contact.createdAt.toISOString(),
-    updatedAt: contact.updatedAt.toISOString(),
-  };
-
-  const locationData = {
-    id: location.id,
-    contactId: location.contactId,
-    dateArrivee: location.dateArrivee.toISOString(),
-    depart: location.depart.toISOString(),
-    adultes: location.adultes,
-    enfants: location.enfants,
-    animaux: location.animaux,
-    prixBase: Number(location.prixBase),
-    taxeParNuit: Number(location.taxeParNuit),
-    frais: Number(location.frais),
-    acompte: Number(location.acompte),
-    caution: Number(location.caution),
-    langue: lang,
-    createdAt: location.createdAt.toISOString(),
-    updatedAt: location.updatedAt.toISOString(),
-  };
+  // Réutilise les mappers du domaine plutôt que de dupliquer le mapping.
+  // contact n'a pas ses locations chargées ici -> toContactDTO renvoie [].
+  // Le param `lang` (query) l'emporte toujours sur la langue stockée.
+  const contactData = toContactDTO(contact);
+  const locationData = { ...toLocationDTO(location), langue: lang };
 
   const DocumentComponent = lang === 'en' ? LocationDocumentEN : LocationDocument;
 

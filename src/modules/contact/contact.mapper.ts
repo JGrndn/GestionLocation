@@ -3,7 +3,9 @@ import type { ContactDTO } from './contact.dto';
 import type { ContactInput } from './contact.schema';
 import { toLocationDTO } from '@/modules/location';
 
-type ContactWithLocations = Contact & { locations: Location[] };
+// `locations` n'est présent que lorsqu'il est inclus dans la requête Prisma
+// (findForPdf, p.ex., ne charge que le contact). D'où le champ optionnel.
+type ContactWithLocations = Contact & { locations?: Location[] };
 
 export function toContactDTO(contact: ContactWithLocations): ContactDTO {
   return {
@@ -13,7 +15,7 @@ export function toContactDTO(contact: ContactWithLocations): ContactDTO {
     email: contact.email,
     telephone: contact.telephone,
     adresse: contact.adresse,
-    locations: contact.locations.map(toLocationDTO),
+    locations: (contact.locations ?? []).map(toLocationDTO),
     createdAt: contact.createdAt.toISOString(),
     updatedAt: contact.updatedAt.toISOString(),
   };
