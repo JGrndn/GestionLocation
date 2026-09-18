@@ -21,7 +21,7 @@ export async function GET(_req: Request, { params }: Params) {
   const { contact } = location;
 
   // lang query param takes priority, falls back to stored langue field
-  const lang = new URL(_req.url).searchParams.get('lang') ?? (location as any).langue ?? 'fr';
+  const lang = new URL(_req.url).searchParams.get('lang') ?? location.langue ?? 'fr';
 
   const contactData = {
     id: contact.id,
