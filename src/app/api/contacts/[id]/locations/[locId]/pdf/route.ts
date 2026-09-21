@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { contentDisposition } from '@/lib/http';
 import { locationService, toLocationDTO } from '@/modules/location';
 import { toContactDTO } from '@/modules/contact';
 import { renderToBuffer } from '@react-pdf/renderer';
@@ -51,7 +52,9 @@ export async function GET(_req: Request, { params }: Params) {
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="location_${contact.nom}_${location.dateArrivee.toISOString().slice(0, 10)}_${lang}.pdf"`,
+      'Content-Disposition': contentDisposition(
+        `location_${contact.nom}_${location.dateArrivee.toISOString().slice(0, 10)}_${lang}.pdf`,
+      ),
     },
   });
 }

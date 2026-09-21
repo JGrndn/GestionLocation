@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { contentDisposition } from '@/lib/http';
 import { documentService, type DocumentKind } from '@/modules/contract';
 
 export const runtime = 'nodejs';
@@ -24,7 +25,7 @@ export async function GET(_req: Request, { params }: Params) {
   return new NextResponse(new Uint8Array(doc.content), {
     headers: {
       'Content-Type': doc.mimeType,
-      'Content-Disposition': `attachment; filename="${doc.filename}"`,
+      'Content-Disposition': contentDisposition(doc.filename),
     },
   });
 }
